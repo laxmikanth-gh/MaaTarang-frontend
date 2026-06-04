@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import logo from "./assets/logo.png";
 
+const API_URL = "https://maatarang-backend.onrender.com";
+
 function App() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://maatarang-clean.onrender.com/products")
+    fetch(`${API_URL}/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error(err));
@@ -89,7 +91,7 @@ function App() {
             >
 
               <img
-                src={`https://maatarang-clean.onrender.com${product.image}`}
+                src={`${API_URL}${product.image}`}
                 alt={product.name}
                 className="w-full h-96 object-contain bg-white"
               />
