@@ -86,7 +86,7 @@ function App() {
 </div>
         {showAdmin && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md">
+  <div className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md transition-all duration-300">
 
       <h2 className="text-3xl font-bold text-teal-800 mb-2">
         Admin Login
