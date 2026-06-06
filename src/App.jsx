@@ -133,6 +133,20 @@ function App() {
   </div>
 )}
     </nav>
+      {isAdmin && (
+  <div className="max-w-6xl mx-auto mt-8 bg-white p-6 rounded-2xl shadow-xl">
+    <h2 className="text-3xl font-bold text-teal-800 mb-4">
+      Admin Dashboard
+    </h2>
+
+    <p className="text-gray-600">
+      Welcome Admin 👑
+    </p>
+  </div>
+)}
+      </nav>
+
+{isAdmin && ( ... )}
 
       {/* Hero Section */}
       <section className="text-center py-24 px-6">
