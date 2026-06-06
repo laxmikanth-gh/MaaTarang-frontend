@@ -10,6 +10,7 @@ function App() {
   const [newPrice, setNewPrice] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newImage, setNewImage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [password, setPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -170,36 +171,49 @@ function App() {
       />
 
       <input
-        type="text"
-        placeholder="Image Path (/images/sample.png)"
-        value={newImage}
-        onChange={(e) => setNewImage(e.target.value)}
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files[0])}
         className="border p-3 rounded-lg"
-      />
+       />
 
       <button
-        onClick={() => {
-          fetch(`${API_URL}/products`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: newName,
-              price: Number(newPrice),
-              category: newCategory,
-              image: newImage,
-            }),
-          })
-            .then((res) => res.json())
-            .then(() => {
-              alert("Product Added ✅");
-              window.location.reload();
-            })
-            .catch(() => {
-              alert("Failed ❌");
-            });
-        }}
+        onClick={async () => {
+  try {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const uploadRes = await fetch(
+      `${API_URL}/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const uploadData = await uploadRes.json();
+
+    await fetch(`${API_URL}/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: newName,
+        price: Number(newPrice),
+        category: newCategory,
+        image: uploadData.imageUrl,
+      }),
+    });
+
+    alert("Product Added Successfully ✅");
+
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    alert("Upload Failed ❌");
+  }
+}}
         className="bg-teal-700 text-white py-3 rounded-lg"
       >
         Add Product
@@ -257,7 +271,7 @@ function App() {
             >
 
               <img
-                src={`${API_URL}${product.image}`}
+                src={product.image}
                 alt={product.name}
                 className="w-full h-96 object-contain bg-white"
               />
