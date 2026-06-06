@@ -6,7 +6,10 @@ const API_URL = "https://maatarang-backend.onrender.com";
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newImage, setNewImage] = useState("");
   const [showAdmin, setShowAdmin] = useState(false);
   const [password, setPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -135,18 +138,77 @@ function App() {
     </nav>
       {isAdmin && (
   <div className="max-w-6xl mx-auto mt-8 bg-white p-6 rounded-2xl shadow-xl">
-    <h2 className="text-3xl font-bold text-teal-800 mb-4">
-      Admin Dashboard
+
+    <h2 className="text-3xl font-bold text-teal-800 mb-6">
+      Admin Dashboard 👑
     </h2>
 
-    <p className="text-gray-600">
-      Welcome Admin 👑
-    </p>
+    <div className="grid gap-4">
+
+      <input
+        type="text"
+        placeholder="Product Name"
+        value={newName}
+        onChange={(e) => setNewName(e.target.value)}
+        className="border p-3 rounded-lg"
+      />
+
+      <input
+        type="number"
+        placeholder="Price"
+        value={newPrice}
+        onChange={(e) => setNewPrice(e.target.value)}
+        className="border p-3 rounded-lg"
+      />
+
+      <input
+        type="text"
+        placeholder="Category"
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        className="border p-3 rounded-lg"
+      />
+
+      <input
+        type="text"
+        placeholder="Image Path (/images/sample.png)"
+        value={newImage}
+        onChange={(e) => setNewImage(e.target.value)}
+        className="border p-3 rounded-lg"
+      />
+
+      <button
+        onClick={() => {
+          fetch(`${API_URL}/products`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: newName,
+              price: Number(newPrice),
+              category: newCategory,
+              image: newImage,
+            }),
+          })
+            .then((res) => res.json())
+            .then(() => {
+              alert("Product Added ✅");
+              window.location.reload();
+            })
+            .catch(() => {
+              alert("Failed ❌");
+            });
+        }}
+        className="bg-teal-700 text-white py-3 rounded-lg"
+      >
+        Add Product
+      </button>
+
+    </div>
+
   </div>
 )}
-      </nav>
-
-{isAdmin && ( ... )}
 
       {/* Hero Section */}
       <section className="text-center py-24 px-6">
