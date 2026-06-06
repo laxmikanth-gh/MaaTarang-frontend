@@ -6,6 +6,7 @@ const API_URL = "https://maatarang-backend.onrender.com";
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdmin, setShowAdmin] = useState(false);
   
  useEffect(() => {
   const loadProducts = () => {
@@ -72,11 +73,52 @@ function App() {
         </div>
 
         <div className="space-x-6 text-gray-700 hidden md:block">
-          <a href="#" className="hover:text-teal-700">Home</a>
-          <a href="#about" className="hover:text-teal-700">About</a>
-          <a href="#contact" className="hover:text-teal-700">Contact</a>
-        </div>
-      </nav>
+  <a href="#" className="hover:text-teal-700">Home</a>
+  <a href="#about" className="hover:text-teal-700">About</a>
+  <a href="#contact" className="hover:text-teal-700">Contact</a>
+
+  <button
+    onClick={() => setShowAdmin(true)}
+    className="bg-teal-700 text-white px-4 py-2 rounded-lg"
+  >
+    Admin
+  </button>
+</div>
+        {showAdmin && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md">
+
+      <h2 className="text-3xl font-bold text-teal-800 mb-2">
+        Admin Login
+      </h2>
+
+      <p className="text-gray-500 mb-6">
+        Enter your admin password
+      </p>
+
+      <input
+        type="password"
+        placeholder="Password"
+        className="w-full border p-3 rounded-lg mb-4"
+      />
+
+      <button
+        className="w-full bg-teal-700 text-white py-3 rounded-lg hover:bg-teal-800"
+      >
+        Login
+      </button>
+
+      <button
+        onClick={() => setShowAdmin(false)}
+        className="w-full mt-3 text-gray-600"
+      >
+        Cancel
+      </button>
+
+    </div>
+  </div>
+)}
+    </nav>
 
       {/* Hero Section */}
       <section className="text-center py-24 px-6">
