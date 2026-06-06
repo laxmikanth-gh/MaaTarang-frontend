@@ -5,14 +5,34 @@ const API_URL = "https://maatarang-backend.onrender.com";
 
 function App() {
   const [products, setProducts] = useState([]);
-
-  useEffect(() => {
+  const [loading, setLoading] = useState(true);
+  
+ useEffect(() => {
+  const loadProducts = () => {
     fetch(`${API_URL}/products`)
       .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err));
-  }, []);
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setTimeout(loadProducts, 3000);
+      });
+  };
 
+  loadProducts();
+}, []);
+
+  if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <h1 className="text-3xl font-bold text-teal-800">
+        Loading Products...
+      </h1>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-amber-50">
 
