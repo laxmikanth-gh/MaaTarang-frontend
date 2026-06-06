@@ -4,9 +4,9 @@ import logo from "./assets/logo.png";
 const API_URL = "https://maatarang-backend.onrender.com";
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   
  useEffect(() => {
   const loadProducts = () => {
@@ -96,17 +96,28 @@ function App() {
         Enter your admin password
       </p>
 
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full border p-3 rounded-lg mb-4"
-      />
+     <input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  className="w-full border p-3 rounded-lg mb-4"
+/>
 
-      <button
-        className="w-full bg-teal-700 text-white py-3 rounded-lg hover:bg-teal-800"
-      >
-        Login
-      </button>
+     <button
+  onClick={() => {
+    if (password === "Bunny@MaaTarang") {
+      setIsAdmin(true);
+      setShowAdmin(false);
+      alert("Admin Login Successful ✅");
+    } else {
+      alert("Wrong Password ❌");
+    }
+  }}
+  className="w-full bg-teal-700 text-white py-3 rounded-lg hover:bg-teal-800"
+>
+  Login
+</button>
 
       <button
         onClick={() => setShowAdmin(false)}
