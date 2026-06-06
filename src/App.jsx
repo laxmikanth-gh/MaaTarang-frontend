@@ -4,6 +4,9 @@ import logo from "./assets/logo.png";
 const API_URL = "https://maatarang-backend.onrender.com";
 
 function App() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [showAdmin, setShowAdmin] = useState(false);
   const [password, setPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
