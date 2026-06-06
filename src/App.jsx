@@ -26,10 +26,24 @@ function App() {
 
   if (loading) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-teal-800">
-        Loading Products...
+    <div className="min-h-screen flex flex-col items-center justify-center bg-amber-50">
+
+      <img
+        src={logo}
+        alt="MaaTarang Logo"
+        className="h-24 w-24 mb-6 animate-pulse"
+      />
+
+      <div className="w-16 h-16 border-4 border-teal-200 border-t-teal-700 rounded-full animate-spin"></div>
+
+      <h1 className="mt-6 text-3xl font-bold text-teal-800">
+        MaaTarang
       </h1>
+
+      <p className="mt-3 text-gray-600 text-center max-w-md px-4">
+        Please wait while we prepare our handcrafted collection ❤️
+      </p>
+
     </div>
   );
 }
