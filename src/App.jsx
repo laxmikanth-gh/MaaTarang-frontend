@@ -9,7 +9,6 @@ function App() {
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [newImage, setNewImage] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [password, setPassword] = useState("");
@@ -220,8 +219,7 @@ function App() {
       </button>
 
     </div>
-
-  </div>
+   </div>
 )}
 
       {/* Hero Section */}
