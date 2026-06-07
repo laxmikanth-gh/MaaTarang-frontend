@@ -48,6 +48,7 @@ const css = `
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    position: relative;
   }
 
   /* Subtle grain overlay */
@@ -58,14 +59,14 @@ const css = `
     pointer-events: none; z-index: 9999; opacity: 0.35;
   }
 
-  /* Fixed Luxury 3D Canvas Background Layout */
+  /* Fixed Luxury 3D Canvas Background Layout - set to z-index 0 */
   .luxury-bg-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
     background: var(--cream);
   }
@@ -77,6 +78,7 @@ const css = `
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     background: var(--ink); position: relative; overflow: hidden;
+    z-index: 999;
   }
   .loader::before {
     content: ''; position: absolute; inset: 0;
@@ -283,6 +285,7 @@ const css = `
     max-width:640px;margin:2.5rem auto;background:var(--white);
     border:1px solid rgba(184,148,42,0.15);border-radius:var(--radius-lg);
     padding:2.5rem;box-shadow:var(--shadow);animation:fadeInUp 0.4s ease;
+    position: relative; z-index: 2;
   }
   .admin__header { display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem; }
   .admin__icon { width:48px;height:48px;border-radius:50%;background:rgba(184,148,42,0.08);border:1px solid rgba(184,148,42,0.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0; }
@@ -293,11 +296,13 @@ const css = `
   .admin__row { display:grid;grid-template-columns:1fr 1fr;gap:0.8rem; }
 
   /* ══════════════════════
-     HERO — 3D effects
+     HERO — Transparent with z-index
   ══════════════════════ */
   .hero {
-    position:relative;text-align:center;
-    padding:9rem 5% 8rem;overflow:hidden;
+    position:relative; text-align:center;
+    padding:9rem 5% 8rem; overflow:hidden;
+    background: transparent;
+    z-index: 1;
   }
 
   /* 3D — parallax background layer */
@@ -377,6 +382,7 @@ const css = `
   .stats {
     display:flex;align-items:stretch;justify-content:center;
     background:var(--ink);padding:2.75rem 5%;
+    position: relative; z-index: 2;
   }
   .stats__item { flex:1;text-align:center;padding:1rem 2rem;border-right:1px solid rgba(250,247,242,0.06); }
   .stats__item:last-child { border-right:none; }
@@ -411,9 +417,14 @@ const css = `
   .section-head__line { width:48px;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:1.1rem auto 0;border-radius:2px; }
 
   /* ══════════════════════
-     PRODUCTS & CARDS
+     PRODUCTS & CARDS — Transparent background setup
   ══════════════════════ */
-  .products { padding:7.5rem 5%; background: transparent; }
+  .products { 
+    padding:7.5rem 5%; 
+    background: transparent; 
+    position: relative;
+    z-index: 1;
+  }
   .products__grid {
     display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
     gap:2.2rem;max-width:1200px;margin:0 auto;
@@ -476,9 +487,14 @@ const css = `
   .card__divider { width:100%;height:1px;background:linear-gradient(90deg,rgba(184,148,42,0.18),transparent);margin-bottom:1.35rem; }
 
   /* ══════════════════════
-     ABOUT — 3D effects
+     ABOUT — Transparent with z-index
   ══════════════════════ */
-  .about { padding:8.5rem 5%; background: transparent; position:relative;overflow:hidden; }
+  .about { 
+    padding:8.5rem 5%; 
+    background: transparent; 
+    position:relative; overflow:hidden;
+    z-index: 1;
+  }
   .about::before { content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,148,42,0.3),rgba(184,148,42,0.3),transparent); }
   .about__inner { max-width:720px;margin:0 auto;text-align:center; }
   .about__logo { width:72px;height:72px;object-fit:contain;margin-bottom:2rem;filter:drop-shadow(0 4px 16px rgba(184,148,42,0.18)); }
@@ -520,7 +536,10 @@ const css = `
   /* ══════════════════════
      FOOTER
   ══════════════════════ */
-  .footer { background:var(--ink);color:rgba(250,247,242,0.6);text-align:center;padding:5.5rem 5% 3.5rem;position:relative; }
+  .footer { 
+    background:var(--ink);color:rgba(250,247,242,0.6);text-align:center;padding:5.5rem 5% 3.5rem;position:relative;
+    z-index: 2; 
+  }
   .footer::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dk),var(--gold),var(--gold-dk),transparent); }
   .footer__logo { width:56px;height:56px;object-fit:contain;margin-bottom:1.5rem;filter:brightness(10) sepia(1) saturate(2) hue-rotate(5deg);opacity:0.75; }
 
@@ -641,7 +660,7 @@ function LuxuryBackground() {
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Ultra-soft flowing silk ambient nodes
+    // Soft flowing silk ambient nodes
     const particles = Array.from({ length: 6 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -654,7 +673,6 @@ function LuxuryBackground() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Interpolate mouse coordinates smoothly
       mouse.x += (mouse.targetX - mouse.x) * 0.05;
       mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
@@ -917,7 +935,7 @@ export default function App() {
     <>
       <style>{css}</style>
       
-      {/* Dynamic 3D Interactive Luxury Particle Overlay */}
+      {/* Dynamic 3D Interactive Luxury Particle Background */}
       <LuxuryBackground />
 
       {/* ── Navbar ── */}
