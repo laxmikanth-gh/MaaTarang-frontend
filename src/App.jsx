@@ -286,15 +286,80 @@ const css = `
   .hero {
     position:relative;text-align:center;
     padding:8rem 5% 7rem;overflow:hidden;
+    background: var(--cream);
   }
 
-  /* 3D — parallax background layer (moved by JS on scroll) */
+  /* Canvas for animated silk threads */
+  .hero__canvas {
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:0;opacity:0.55;
+  }
+
+  /* Layered decorative background */
   .hero__bg {
     position:absolute;inset:0;pointer-events:none;will-change:transform;
     background:
-      radial-gradient(ellipse 80% 70% at 50% 50%, rgba(184,148,42,0.09), transparent 70%),
-      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(15,110,86,0.05), transparent);
+      radial-gradient(ellipse 65% 55% at 50% 40%, rgba(184,148,42,0.12), transparent 65%),
+      radial-gradient(ellipse 40% 40% at 15% 85%, rgba(15,110,86,0.07), transparent),
+      radial-gradient(ellipse 30% 30% at 85% 15%, rgba(184,148,42,0.06), transparent);
     transition:transform 0.05s linear;
+  }
+
+  /* Floating embroidery-motif decorations */
+  .hero__motif {
+    position:absolute;pointer-events:none;opacity:0.07;
+    animation:motifDrift 18s ease-in-out infinite;
+  }
+  .hero__motif:nth-child(3) { width:320px;height:320px;top:-60px;right:-60px;animation-delay:-3s;animation-duration:22s; }
+  .hero__motif:nth-child(4) { width:220px;height:220px;bottom:-40px;left:-30px;animation-delay:-9s;animation-duration:16s; }
+  .hero__motif:nth-child(5) { width:160px;height:160px;top:30%;right:8%;animation-delay:-6s;animation-duration:20s;opacity:0.05; }
+  @keyframes motifDrift {
+    0%,100% { transform:translate(0,0) rotate(0deg) scale(1); }
+    33%      { transform:translate(8px,-12px) rotate(8deg) scale(1.04); }
+    66%      { transform:translate(-6px,8px) rotate(-5deg) scale(0.97); }
+  }
+
+  /* Floating gold dust particles */
+  .hero__particle {
+    position:absolute;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(184,148,42,0.6) 0%, transparent 70%);
+    animation:particleFloat linear infinite;
+  }
+  @keyframes particleFloat {
+    0%   { transform:translateY(0) translateX(0) scale(1); opacity:0; }
+    10%  { opacity:1; }
+    90%  { opacity:0.6; }
+    100% { transform:translateY(-120px) translateX(30px) scale(0.4); opacity:0; }
+  }
+
+  /* Diagonal shimmer sweep across hero */
+  .hero::before {
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(184,148,42,0.04) 45%,
+      rgba(245,230,163,0.06) 50%,
+      rgba(184,148,42,0.04) 55%,
+      transparent 70%
+    );
+    background-size:300% 100%;
+    animation:heroSweep 6s ease-in-out infinite;
+  }
+  @keyframes heroSweep {
+    0%   { background-position:200% 0; }
+    100% { background-position:-100% 0; }
+  }
+
+  /* Subtle geometric grid overlay */
+  .hero::after {
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(rgba(184,148,42,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(184,148,42,0.04) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
   }
 
   .hero__eyebrow {
@@ -828,6 +893,132 @@ function useQuoteFlip() {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   HERO CANVAS — animated silk threads + floating particles
+══════════════════════════════════════════════════════════════ */
+function useHeroCanvas() {
+  useEffect(() => {
+    const canvas = document.getElementById("hero-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let W, H, animId;
+    const THREAD_COUNT = 18;
+    const threads = [];
+
+    function resize() {
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+
+    class Thread {
+      constructor() { this.reset(true); }
+      reset(init = false) {
+        this.x  = Math.random() * (W || 1400);
+        this.y  = init ? Math.random() * (H || 700) : (H || 700) + 20;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = -(0.3 + Math.random() * 0.5);
+        this.len = 80 + Math.random() * 160;
+        this.width = 0.5 + Math.random() * 1.2;
+        this.alpha = 0;
+        this.maxAlpha = 0.12 + Math.random() * 0.2;
+        this.phase = Math.random() * Math.PI * 2;
+        this.freq  = 0.008 + Math.random() * 0.012;
+        this.amp   = 15 + Math.random() * 35;
+        this.hue   = Math.random() > 0.7 ? "15,110,86" : "184,148,42";
+        this.t = 0;
+        this.life = 0;
+        this.maxLife = 200 + Math.random() * 300;
+      }
+      update() {
+        this.t++;
+        this.life++;
+        this.x += this.vx + Math.sin(this.t * this.freq + this.phase) * 0.3;
+        this.y += this.vy;
+        const progress = this.life / this.maxLife;
+        this.alpha = progress < 0.15
+          ? (progress / 0.15) * this.maxAlpha
+          : progress > 0.8
+            ? ((1 - progress) / 0.2) * this.maxAlpha
+            : this.maxAlpha;
+        if (this.life > this.maxLife || this.y < -this.len - 20) this.reset();
+      }
+      draw() {
+        const dx = Math.sin(this.t * this.freq + this.phase) * this.amp;
+        const grad = ctx.createLinearGradient(this.x, this.y, this.x + dx, this.y - this.len);
+        grad.addColorStop(0, `rgba(${this.hue},0)`);
+        grad.addColorStop(0.3, `rgba(${this.hue},${this.alpha})`);
+        grad.addColorStop(0.7, `rgba(${this.hue},${this.alpha * 0.7})`);
+        grad.addColorStop(1, `rgba(${this.hue},0)`);
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        // Bezier silk curve
+        ctx.bezierCurveTo(
+          this.x + dx * 0.4, this.y - this.len * 0.3,
+          this.x + dx * 0.8, this.y - this.len * 0.7,
+          this.x + dx,       this.y - this.len
+        );
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = this.width;
+        ctx.lineCap = "round";
+        ctx.stroke();
+      }
+    }
+
+    // Floating sparkle dots
+    const SPARKS = 28;
+    const sparks = Array.from({length: SPARKS}, () => ({
+      x: Math.random() * 1400,
+      y: Math.random() * 700,
+      r: 0.8 + Math.random() * 2.2,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -(0.15 + Math.random() * 0.3),
+      alpha: 0,
+      maxAlpha: 0.2 + Math.random() * 0.35,
+      life: Math.floor(Math.random() * 400),
+      maxLife: 300 + Math.random() * 400,
+      hue: Math.random() > 0.6 ? "184,148,42" : "232,212,138",
+    }));
+
+    function updateSpark(s) {
+      s.life++;
+      s.x += s.vx;
+      s.y += s.vy + Math.sin(s.life * 0.02) * 0.2;
+      const p = (s.life % s.maxLife) / s.maxLife;
+      s.alpha = p < 0.2 ? (p / 0.2) * s.maxAlpha : p > 0.75 ? ((1 - p) / 0.25) * s.maxAlpha : s.maxAlpha;
+      if (s.life > s.maxLife) {
+        s.x = Math.random() * W;
+        s.y = H + 10;
+        s.life = 0;
+      }
+    }
+
+    function drawSpark(s) {
+      ctx.beginPath();
+      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+      g.addColorStop(0, `rgba(${s.hue},${s.alpha})`);
+      g.addColorStop(1, `rgba(${s.hue},0)`);
+      ctx.fillStyle = g;
+      ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    resize();
+    for (let i = 0; i < THREAD_COUNT; i++) threads.push(new Thread());
+
+    function loop() {
+      ctx.clearRect(0, 0, W, H);
+      threads.forEach(t => { t.update(); t.draw(); });
+      sparks.forEach(s => { updateSpark(s); drawSpark(s); });
+      animId = requestAnimationFrame(loop);
+    }
+    loop();
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+    return () => { cancelAnimationFrame(animId); ro.disconnect(); };
+  }, []);
+}
+
+/* ══════════════════════════════════════════════════════════════
    FAQ ACCORDION COMPONENT
 ══════════════════════════════════════════════════════════════ */
 const FAQ_DATA = [
@@ -950,6 +1141,7 @@ export default function App() {
   useTilt(".card", 10);
   useTilt(".about__feature", 14);
   useTilt(".process__step", 8);
+  useHeroCanvas();
 
   /* ── Admin login helper ── */
   const doLogin = useCallback(() => {
@@ -1127,9 +1319,42 @@ export default function App() {
 
       {/* ── Hero ── */}
       <section className="hero">
+        <canvas id="hero-canvas" className="hero__canvas" />
         <div className="hero__bg" />
         <div className="hero__ring"><div className="hero__ring-dot" /></div>
         <div className="hero__ring" />
+        {/* Decorative embroidery-inspired motifs */}
+        <svg className="hero__motif" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" stroke="#B8942A" strokeWidth="1"/>
+          <circle cx="100" cy="100" r="70" stroke="#B8942A" strokeWidth="0.5"/>
+          <circle cx="100" cy="100" r="50" stroke="#B8942A" strokeWidth="1"/>
+          {[0,45,90,135,180,225,270,315].map(a=>(
+            <g key={a} transform={`rotate(${a} 100 100)`}>
+              <line x1="100" y1="10" x2="100" y2="30" stroke="#B8942A" strokeWidth="1.5"/>
+              <circle cx="100" cy="35" r="4" fill="#B8942A"/>
+              <path d="M100 50 Q110 70 100 90 Q90 70 100 50" fill="#B8942A" opacity="0.4"/>
+            </g>
+          ))}
+        </svg>
+        <svg className="hero__motif" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="80" stroke="#0F6E56" strokeWidth="0.8"/>
+          {[0,60,120,180,240,300].map(a=>(
+            <g key={a} transform={`rotate(${a} 100 100)`}>
+              <path d="M100 20 Q120 60 100 100 Q80 60 100 20" fill="#0F6E56" opacity="0.3"/>
+              <circle cx="100" cy="20" r="5" fill="#0F6E56" opacity="0.5"/>
+            </g>
+          ))}
+          <circle cx="100" cy="100" r="15" stroke="#0F6E56" strokeWidth="1.5"/>
+          <circle cx="100" cy="100" r="6" fill="#0F6E56" opacity="0.4"/>
+        </svg>
+        <svg className="hero__motif" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {[0,90,180,270].map(a=>(
+            <g key={a} transform={`rotate(${a} 50 50)`}>
+              <path d="M50 5 Q65 30 50 50 Q35 30 50 5" fill="#B8942A"/>
+            </g>
+          ))}
+          <circle cx="50" cy="50" r="8" stroke="#B8942A" strokeWidth="1.5"/>
+        </svg>
         <p className="hero__eyebrow">Handcrafted in India · Est. 2012</p>
         <h1 className="hero__title">
           Wear the art of<br />
