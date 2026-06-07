@@ -196,7 +196,7 @@ const WaIcon = () => (
 );
 
 /* ══════════════════════════════════════════════════════════════
-   GLOWING 3D PARTICLES CANVAS BACKGROUND
+   UPGRADED INTERACTIVE CONSTELLATION SILK THREAD NETWORK
 ══════════════════════════════════════════════════════════════ */
 function LuxuryBackground() {
   const canvasRef = useRef(null);
@@ -205,48 +205,104 @@ function LuxuryBackground() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let animationFrameId, width = (canvas.width = window.innerWidth), height = (canvas.height = window.innerHeight);
-    let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2 };
+    let animationFrameId;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
 
-    const handleResize = () => { if (canvas) { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } };
-    const handleMouseMove = (e) => { mouse.targetX = e.clientX; mouse.targetY = e.clientY; };
+    let mouse = { x: null, y: null, maxDist: 180 };
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = null;
+      mouse.y = null;
+    };
 
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
 
-    // Glowing golden ambient vectors floating in mid-dark velvet space
-    const particles = Array.from({ length: 8 }, () => ({
-      x: Math.random() * width, y: Math.random() * height,
-      radius: Math.random() * 150 + 120,
-      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
-      color: Math.random() > 0.5 ? "232, 212, 138" : "184, 148, 42"
+    // Create intricate interactive thread nodes
+    const particleCount = Math.min(Math.floor((width * height) / 22000), 55);
+    const nodes = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: Math.random() * 2 + 1.5
     }));
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-      mouse.x += (mouse.targetX - mouse.x) * 0.05; mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
-      particles.forEach((p) => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < -p.radius) p.x = width + p.radius; if (p.x > width + p.radius) p.x = -p.radius;
-        if (p.y < -p.radius) p.y = height + p.radius; if (p.y > height + p.radius) p.y = -p.radius;
+      // 1. Draw and translate nodes
+      nodes.forEach((n) => {
+        n.x += n.vx;
+        n.y += n.vy;
 
-        const dx = mouse.x - p.x; const dy = mouse.y - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const shiftX = (dx / dist) * -20; const shiftY = (dy / dist) * -20;
+        // Boundary safety check
+        if (n.x < 0 || n.x > width) n.vx *= -1;
+        if (n.y < 0 || n.y > height) n.vy *= -1;
 
-        const gradient = ctx.createRadialGradient(p.x + shiftX, p.y + shiftY, 0, p.x + shiftX, p.y + shiftY, p.radius);
-        gradient.addColorStop(0, `rgba(${p.color}, 0.07)`);
-        gradient.addColorStop(0.5, `rgba(${p.color}, 0.02)`);
-        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+        // Mouse Magnet attraction logic
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - n.x;
+          const dy = mouse.y - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.maxDist) {
+            // Smoothly draw nodes slightly towards pointer context
+            n.x += (dx / dist) * 0.25;
+            n.y += (dy / dist) * 0.25;
+          }
+        }
 
-        ctx.fillStyle = gradient; ctx.beginPath();
-        ctx.arc(p.x + shiftX, p.y + shiftY, p.radius, 0, Math.PI * 2); ctx.fill();
+        // Render standalone shimmering stardust node points
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(232, 212, 138, 0.4)";
+        ctx.fill();
       });
+
+      // 2. Connect intersections to spin elegant lace lines
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const distVecX = nodes[i].x - nodes[j].x;
+          const distVecY = nodes[i].y - nodes[j].y;
+          const distance = Math.sqrt(distVecX * distVecX + distVecY * distVecY);
+
+          if (distance < 130) {
+            const opacity = (1 - distance / 130) * 0.16;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            // Splendid luxury gold lace weave overlay
+            ctx.strokeStyle = `rgba(184, 148, 42, ${opacity})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
       animationFrameId = requestAnimationFrame(render);
     };
+
     render();
-    return () => { window.removeEventListener("resize", handleResize); window.removeEventListener("mousemove", handleMouseMove); cancelAnimationFrame(animationFrameId); };
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return <canvas ref={canvasRef} className="luxury-bg-canvas" />;
@@ -263,8 +319,8 @@ export default function App() {
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [imageFile, setImageFile]   = useState(null);
+  const [uploading, setUploading]   = useState(false);
 
   /* ── URL Parameter Navigation Monitor (Detail Routing Router) ── */
   useEffect(() => {
