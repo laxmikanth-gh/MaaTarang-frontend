@@ -4,10 +4,10 @@ import logo from "./assets/logo.png";
 const API_URL = "https://maatarang-backend.onrender.com";
 
 /* ═══════════════════════════════════════════════════════════════
-   CSS  — Fully Restored Mid-Light Ivory Theme & Interactive Waves
+   CSS  — Mid-Light Luxury Theme & Fluid Silk Motion Styles
 ═══════════════════════════════════════════════════════════════ */
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,7 +51,7 @@ const css = `
     position: relative;
   }
 
-  /* Canvas layout style context */
+  /* Fixed Background Layer Canvas */
   .luxury-bg-canvas {
     position: fixed; top: 0; left: 0;
     width: 100vw; height: 100vh;
@@ -82,7 +82,6 @@ const css = `
     width: 90px; height: 90px; object-fit: contain;
     filter: brightness(10) sepia(1) saturate(3) hue-rotate(5deg);
     opacity: 0.9; margin-bottom: 2rem;
-    animation: loaderFloat 3s ease-in-out infinite;
   }
   .loader__title {
     font-family: var(--ff-display); font-size: 3.2rem; font-weight: 400;
@@ -154,7 +153,7 @@ const css = `
   .modal__divider { width:36px;height:1.5px;background:linear-gradient(90deg,var(--gold),var(--gold-lt));margin: 0 auto 1.75rem;border-radius:2px; }
 
   /* ══════════════════════
-     AMAZON-STYLE FULL DETAILED ROUTE SHEET
+     SHAREABLE DETAILED PRODUCT CARD SHEET
   ══════════════════════ */
   .detail-route-view {
     position: fixed; inset: 0; z-index: 20000;
@@ -176,7 +175,7 @@ const css = `
   .detail-route__share-btn:hover { background: rgba(0,0,0,0.03); border-color: var(--ink); }
 
   /* ══════════════════════
-     ADMIN PANEL CONSOLE
+     ADMIN PANEL DASHBOARD
   ══════════════════════ */
   .admin {
     max-width:680px; margin:2.5rem auto; background:var(--white);
@@ -188,6 +187,7 @@ const css = `
   .admin__title { font-family:var(--ff-serif);font-size:1.75rem;font-weight:500;color:var(--ink); }
   .admin__sub { font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dk);font-weight:600; }
   .admin__divider { width:100%;height:1px;background:linear-gradient(90deg,rgba(184,148,42,0.3),transparent);margin-bottom:2rem; }
+  .admin__grid { display:grid;gap:0; }
   .admin__row { display:grid;grid-template-columns:1fr 1fr;gap:0.8rem; }
 
   .field-wrap { position:relative;margin-bottom:0.85rem; text-align: left; }
@@ -196,7 +196,7 @@ const css = `
   .field:focus { border-color:var(--gold); }
 
   /* ══════════════════════
-     HERO CORE MODULE
+     HERO CORE VISUALS
   ══════════════════════ */
   .hero { position:relative; text-align:center; padding:8rem 5% 7rem; background: transparent; z-index: 1; }
   .hero__bg { position:absolute; inset:0; pointer-events:none; will-change:transform; background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(184,148,42,0.08), transparent 75%); }
@@ -204,7 +204,7 @@ const css = `
   .hero__eyebrow::before,.hero__eyebrow::after { content:''; display:block; width:28px; height:1px; background:var(--gold); }
   .hero__title { font-family:var(--ff-display); font-size:clamp(3rem,7vw,6rem); font-weight:400; line-height:1.05; color:var(--ink); margin-bottom:1.5rem; letter-spacing:0.01em; }
   .hero__title em { font-style:italic; background:linear-gradient(120deg, var(--gold-dk) 0%, var(--gold) 30%, var(--gold-shine) 50%, var(--gold) 70%, var(--gold-dk) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .hero__desc { font-size:1rem; line-height:1.95; color:var(--ink-lt); max-width:500px; margin:0 auto 2.5rem; letter-spacing:0.02em; }
+  .hero__desc { font-size:1rem; line-height:1.95; color:var(--ink-lt); max-width:500px; margin:0 auto; margin-bottom:2.5rem; letter-spacing:0.02em; }
   .hero__pills { display:flex; align-items:center; justify-content:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:3rem; }
   .hero__pill { font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-lt); padding:6px 14px; border:1px solid rgba(184,148,42,0.25); border-radius:100px; display:inline-flex; align-items:center; gap:6px; background:rgba(250,247,242,0.8); font-weight: 500; }
   .hero__pill-dot { width:5px; height:5px; border-radius:50%; background:var(--gold); }
@@ -241,7 +241,7 @@ const css = `
   .card__price { font-family:var(--ff-display); font-size:2rem; color:var(--teal); }
 
   /* ══════════════════════
-     EDITORIAL ABOUT GRAPH
+     EDITORIAL STORY PANELS
   ══════════════════════ */
   .about { padding:7rem 5%; background:transparent; position:relative; overflow:hidden; z-index: 1; }
   .about__inner { max-width:700px; margin:0 auto; text-align:center; }
@@ -249,7 +249,7 @@ const css = `
   .about__text { font-size:1rem; line-height:2; color:var(--ink-lt); letter-spacing:0.02em; }
 
   /* ══════════════════════
-     PREMIUM STYLED FOOTER LINKS
+     PREMIUM FOOTER ARRAYS
   ══════════════════════ */
   .footer { background:var(--ink); color:rgba(250,247,242,0.65); text-align:center; padding:5rem 5% 3rem; position:relative; z-index: 2; }
   .footer::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--gold-dk),var(--gold),var(--gold-dk),transparent); }
@@ -274,6 +274,12 @@ const css = `
     .detail-route-card { grid-template-columns: 1fr; }
   }
 `;
+
+const WaIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+);
 
 /* ── Liquid Dynamic Silk Waves Engine Component ── */
 function LuxuryBackground() {
