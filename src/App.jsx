@@ -4,7 +4,7 @@ import logo from "./assets/logo.png";
 const API_URL = "https://maatarang-backend.onrender.com";
 
 /* ═══════════════════════════════════════════════════════════════
-   CSS  — Ultra-Premium Velvet Dark Theme with Fluid Geometry
+   CSS  — Premium Mid-Light Editorial Theme (Warm Luxury Alabaster)
 ═══════════════════════════════════════════════════════════════ */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
@@ -16,14 +16,15 @@ const css = `
     --gold-lt:     #E8D48A;
     --gold-dk:     #7A5F10;
     --gold-shine:  #F5E6A3;
-    --luxury-bg:   #13110F; /* Velvet Midnight Espresso */
-    --card-bg:     rgba(28, 25, 22, 0.55);
-    --ink:         #FAF7F2; 
-    --ink-md:      #E8E2DA;
-    --ink-lt:      #B3A798;
-    --white:       #1F1B18;
-    --shadow-sm:   0 4px 30px rgba(0, 0, 0, 0.4);
-    --shadow-lg:   0 20px 60px rgba(0, 0, 0, 0.7);
+    --luxury-bg:   #F9F6F0; /* Premium Mid-Light Warm Alabaster */
+    --card-bg:     rgba(255, 255, 255, 0.75); /* Soft premium glass tint */
+    --ink:         #1A1715; /* Sophisticated deep charcoal ink text */
+    --ink-md:      #3A3530;
+    --ink-lt:      #736B62;
+    --teal:        #0B5345;
+    --white:       #FFFFFF;
+    --shadow-sm:   0 10px 35px rgba(26, 23, 21, 0.04);
+    --shadow-lg:   0 30px 70px rgba(26, 23, 21, 0.12);
     --ff-display:  'DM Serif Display', Georgia, serif;
     --ff-serif:    'Playfair Display', Georgia, serif;
     --ff-sans:     'DM Sans', sans-serif;
@@ -43,7 +44,15 @@ const css = `
     position: relative;
   }
 
-  /* Interactive Canvas Wrapper */
+  /* Grain Texture Accent */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.4;
+  }
+
+  /* Fixed Animation Background Layer Canvas */
   .luxury-bg-canvas {
     position: fixed; top: 0; left: 0;
     width: 100vw; height: 100vh;
@@ -56,120 +65,127 @@ const css = `
   ══════════════════════ */
   .nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(19, 17, 15, 0.75);
+    background: rgba(249, 246, 240, 0.8);
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
     border-bottom: 1px solid rgba(184, 148, 42, 0.12);
     padding: 0 6%; display: flex; align-items: center; justify-content: space-between;
     height: 84px; transition: var(--transition);
   }
-  .nav.scrolled { height: 70px; background: rgba(14, 12, 10, 0.92); }
+  .nav.scrolled { height: 70px; background: rgba(249, 246, 240, 0.95); box-shadow: var(--shadow-sm); }
   .nav__brand { display: flex; align-items: center; gap: 0.9rem; text-decoration: none; }
   .nav__logo { width: 44px; height: 44px; transition: transform 0.4s ease; }
-  .nav__brand:hover .nav__logo { transform: scale(1.08) rotate(5deg); }
-  .nav__name { font-family: var(--ff-display); font-size: 1.65rem; color: var(--ink); letter-spacing: 0.05em; }
-  .nav__tagline { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-lt); }
+  .nav__brand:hover .nav__logo { transform: scale(1.08) rotate(4deg); }
+  .nav__name { font-family: var(--ff-display); font-size: 1.65rem; color: var(--ink); letter-spacing: 0.04em; }
+  .nav__tagline { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-dk); font-weight: 700; margin-top: 1px; }
   .nav__links { display: flex; align-items: center; gap: 2.8rem; list-style: none; }
-  .nav__link { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-md); text-decoration: none; font-weight: 600; }
-  .nav__btn { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-lt); background: transparent; border: 1.5px solid rgba(184,148,42,0.4); padding: 9px 22px; cursor: pointer; border-radius: var(--radius); transition: var(--transition); font-weight: 600; }
-  .nav__btn:hover { background: var(--gold); color: #111; border-color: var(--gold); }
+  .nav__link { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-md); text-decoration: none; font-weight: 600; position: relative; }
+  .nav__link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px; background: var(--gold); transition: width 0.3s; }
+  .nav__link:hover::after { width: 100%; }
+  .nav__btn { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); background: transparent; border: 1.5px solid rgba(184,148,42,0.5); padding: 9px 22px; cursor: pointer; border-radius: var(--radius); transition: var(--transition); font-weight: 600; }
+  .nav__btn:hover { background: var(--ink); color: var(--luxury-bg); border-color: var(--ink); }
 
   /* ══════════════════════
-     HERO & PILLS
+     HERO SECTOR
   ══════════════════════ */
   .hero { position: relative; text-align: center; padding: 10rem 5% 9rem; z-index: 1; }
-  .hero__eyebrow { font-size: 0.65rem; letter-spacing: 0.45em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 12px; }
+  .hero__eyebrow { font-size: 0.65rem; letter-spacing: 0.45em; text-transform: uppercase; color: var(--gold-dk); margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 12px; font-weight: 700; }
   .hero__eyebrow::before, .hero__eyebrow::after { content:''; display:block; width:30px; height:1px; background:var(--gold); }
-  .hero__title { font-family: var(--ff-display); font-size: clamp(3.2rem, 7.5vw, 6rem); color: var(--ink); line-height: 1.1; margin-bottom: 1.5rem; }
-  .hero__title em { font-style: italic; background: linear-gradient(120deg, var(--gold-lt), var(--gold-shine), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero__title { font-family: var(--ff-display); font-size: clamp(3.2rem, 7.5vw, 6rem); color: var(--ink); line-height: 1.1; margin-bottom: 1.5rem; font-weight: 400; letter-spacing: -0.01em; }
+  .hero__title em { font-style: italic; background: linear-gradient(135deg, var(--ink) 20%, var(--gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .hero__desc { font-size: 1.05rem; line-height: 2; color: var(--ink-lt); max-width: 540px; margin: 0 auto 3rem; }
-  .hero__pill { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-md); padding: 8px 18px; border: 1px solid rgba(184,148,42,0.22); border-radius: 100px; background: rgba(28, 25, 22, 0.4); backdrop-filter: blur(8px); margin: 0 0.35rem; display: inline-flex; align-items: center; gap: 6px; }
-  .hero__pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-lt); }
+  .hero__pill { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-md); padding: 8px 18px; border: 1px solid rgba(184,148,42,0.25); border-radius: 100px; background: var(--card-bg); backdrop-filter: blur(8px); margin: 0 0.35rem; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+  .hero__pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
 
   /* ══════════════════════
-     PRODUCTS GRID & CARDS
+     PRODUCTS GALLERY 
   ══════════════════════ */
   .products { padding: 6rem 5%; position: relative; z-index: 1; }
   .products__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }
   .card {
     background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden;
-    border: 1px solid rgba(184, 148, 42, 0.12); backdrop-filter: blur(12px);
+    border: 1px solid rgba(184, 148, 42, 0.08); backdrop-filter: blur(12px);
     box-shadow: var(--shadow-sm); opacity: 0; transform: translateY(30px);
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s, border-color 0.5s;
     cursor: pointer; display: block; text-decoration: none; color: inherit;
   }
   .card.visible { opacity: 1; transform: translateY(0); }
-  .card:hover { transform: translateY(-10px); border-color: rgba(184, 148, 42, 0.4); box-shadow: var(--shadow-lg); }
-  .card__img-wrap { position: relative; overflow: hidden; height: 360px; background: #1A1715; }
+  .card:hover { transform: translateY(-10px); border-color: rgba(184, 148, 42, 0.35); box-shadow: var(--shadow-lg); }
+  .card__img-wrap { position: relative; overflow: hidden; height: 360px; background: #F3ECE2; }
   .card__img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s var(--transition); }
-  .card:hover .card__img { transform: scale(1.04); }
-  .card__badge { position: absolute; top: 14px; right: 14px; background: rgba(184,148,42,0.9); color: #111; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; font-weight: 700; }
-  .card__body { padding: 1.75rem; }
-  .card__name { font-family: var(--ff-serif); font-size: 1.4rem; color: var(--ink); margin-bottom: 0.35rem; }
-  .card__cat { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 1.2rem; }
-  .card__price { font-family: var(--ff-display); font-size: 2rem; color: var(--gold-shine); }
+  .card:hover .card__img { transform: scale(1.03); }
+  .card__badge { position: absolute; top: 14px; right: 14px; background: var(--ink); color: var(--luxury-bg); font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; font-weight: 700; }
+  .card__body { padding: 1.75rem; background: var(--white); }
+  .card__name { font-family: var(--ff-serif); font-size: 1.4rem; color: var(--ink); margin-bottom: 0.35rem; font-weight: 500; }
+  .card__cat { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-lt); margin-bottom: 1.2rem; font-weight: 600; }
+  .card__price { font-family: var(--ff-display); font-size: 1.9rem; color: var(--teal); font-weight: 400; }
 
   /* ══════════════════════
-     INTERACTIVE DETAIL INTERFACE
+     DYNAMIC SPECIFICATION MODAL VIEW
   ══════════════════════ */
-  .detail-view { position: fixed; inset: 0; z-index: 200; background: rgba(12, 11, 10, 0.94); backdrop-filter: blur(24px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
-  .detail-card { background: #1C1917; border: 1px solid rgba(184, 148, 42, 0.2); max-width: 960px; width: 100%; border-radius: var(--radius-lg); display: grid; grid-template-columns: 1.1fr 0.9fr; overflow: hidden; box-shadow: var(--shadow-lg); }
-  .detail__gallery { background: #141211; display: flex; align-items: center; justify-content: center; padding: 2rem; position: relative; min-height: 450px; }
+  .detail-view { position: fixed; inset: 0; z-index: 5000; background: rgba(26, 23, 21, 0.45); backdrop-filter: blur(24px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .detail-card { background: var(--white); border: 1px solid rgba(184, 148, 42, 0.15); max-width: 960px; width: 100%; border-radius: var(--radius-lg); display: grid; grid-template-columns: 1.1fr 0.9fr; overflow: hidden; box-shadow: var(--shadow-lg); position: relative; }
+  .detail__gallery { background: #F5EFE6; display: flex; align-items: center; justify-content: center; padding: 2rem; min-height: 450px; }
   .detail__img { max-width: 100%; max-height: 480px; object-fit: contain; }
-  .detail__content { padding: 3.5rem 3rem; display: flex; flex-direction: column; justify-content: center; }
-  .detail__close { position: absolute; top: 2rem; right: 2rem; background: transparent; border: none; color: var(--ink-lt); font-size: 1.5rem; cursor: pointer; }
+  .detail__content { padding: 4rem 3.5rem; display: flex; flex-direction: column; justify-content: center; background: var(--white); }
+  .detail__close { position: absolute; top: 2rem; right: 2rem; background: var(--ink); border: none; color: #FFF; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; z-index: 10; }
   
   /* ══════════════════════
-     ADMIN OVERLAY PANELS
+     ADMIN SYSTEM CONTROLS (HIGH PRIORITY OVERLAYS)
   ══════════════════════ */
-  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(10, 8, 7, 0.88); backdrop-filter: blur(16px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
-  .modal { background: #1C1917; border: 1px solid rgba(184, 148, 42, 0.25); max-width: 420px; width: 100%; border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg); text-align: center; }
-  .modal__title { font-family: var(--ff-serif); font-size: 1.8rem; color: var(--ink); margin-bottom: 0.5rem; font-weight: 400; }
-  .modal__sub { font-size: 0.8rem; color: var(--ink-lt); margin-bottom: 2rem; letter-spacing: 0.05em; }
+  .modal-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(26, 23, 21, 0.6); backdrop-filter: blur(16px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .modal { background: var(--white); border: 1px solid rgba(184, 148, 42, 0.2); max-width: 400px; width: 100%; border-radius: var(--radius-lg); padding: 3rem 2.5rem; box-shadow: var(--shadow-lg); text-align: center; }
+  .modal__title { font-family: var(--ff-serif); font-size: 1.8rem; color: var(--ink); margin-bottom: 0.5rem; font-weight: 500; }
+  .modal__sub { font-size: 0.8rem; color: var(--ink-lt); margin-bottom: 2rem; letter-spacing: 0.04em; }
   
-  .admin-panel { max-width: 700px; margin: 4rem auto; background: rgba(28, 25, 22, 0.8); border: 1px solid rgba(184,148,42,0.2); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-lg); position: relative; z-index: 10; backdrop-filter: blur(12px); }
-  .admin-panel__title { font-family: var(--ff-serif); font-size: 2rem; color: var(--gold-shine); margin-bottom: 1.5rem; font-weight: 400; }
+  .admin-panel { max-width: 740px; margin: 4rem auto; background: var(--white); border: 1px solid rgba(184,148,42,0.18); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-lg); position: relative; z-index: 10; }
+  .admin-panel__title { font-family: var(--ff-serif); font-size: 2rem; color: var(--ink); margin-bottom: 1.5rem; font-weight: 500; }
   
   .field-wrap { position: relative; margin-bottom: 1.25rem; text-align: left; }
-  .field-label { display: block; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-lt); font-weight: 600; margin-bottom: 6px; }
-  .field { width: 100%; font-family: var(--ff-sans); font-size: 0.9rem; color: #FFF; background: #141211; border: 1px solid rgba(184,148,42,0.2); padding: 12px 16px; border-radius: var(--radius); outline: none; }
-  .field:focus { border-color: var(--gold-lt); box-shadow: 0 0 10px rgba(232,212,138,0.1); }
+  .field-label { display: block; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-lt); font-weight: 700; margin-bottom: 6px; }
+  .field { width: 100%; font-family: var(--ff-sans); font-size: 0.9rem; color: var(--ink); background: var(--luxury-bg); border: 1px solid rgba(184,148,42,0.25); padding: 12px 16px; border-radius: var(--radius); outline: none; }
+  .field:focus { border-color: var(--ink); box-shadow: 0 0 10px rgba(0,0,0,0.02); }
   
   /* ══════════════════════
-     EDITORIAL STORY & FOOTER
+     EDITORIAL ABOUT LAYOUT 
   ══════════════════════ */
   .about { padding: 8.5rem 6%; position: relative; z-index: 1; }
   .about__layout { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 4rem; max-width: 1200px; margin: 0 auto; }
-  .about__title-mockup { font-family: var(--ff-serif); font-size: clamp(2.5rem, 4.5vw, 3.4rem); color: var(--ink); line-height: 1.2; }
-  .about__title-mockup em { font-style: normal; color: var(--gold-lt); }
+  .about__title-mockup { font-family: var(--ff-serif); font-size: clamp(2.5rem, 4.5vw, 3.4rem); color: var(--ink); line-height: 1.2; font-weight: 400; }
+  .about__title-mockup em { font-style: normal; color: var(--gold); font-weight: 500; }
   .about__text { font-size: 1.05rem; line-height: 2.1; color: var(--ink-lt); }
 
-  .footer-premium { background: #0A0908; color: #8C8C8C; padding: 6rem 6% 3rem; position: relative; z-index: 2; border-top: 1px solid rgba(184, 148, 42, 0.1); }
+  /* ══════════════════════
+     PREMIUM MULTI-COLUMN FOOTER
+  ══════════════════════ */
+  .footer-premium { background: var(--ink); color: #A8A29A; padding: 6.5rem 6% 3.5rem; position: relative; z-index: 2; }
   .footer__grid-columns { display: grid; grid-template-columns: 1.3fr repeat(4, 1fr); gap: 3rem; max-width: 1200px; margin: 0 auto 4rem; }
-  .footer__brand-title { font-family: var(--ff-display); font-size: 1.6rem; color: var(--gold-lt); letter-spacing: 0.05em; }
+  .footer__brand-title { font-family: var(--ff-display); font-size: 1.75rem; color: var(--gold-lt); letter-spacing: 0.04em; margin-bottom: 0.5rem; }
   .footer__column-title { font-size: 0.82rem; letter-spacing: 0.2em; text-transform: uppercase; color: #FFF; margin-bottom: 1.5rem; font-weight: 700; }
   .footer__column-links { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
-  .footer__column-link { font-size: 0.88rem; color: #8C8C8C; text-decoration: none; transition: color 0.2s; }
-  .footer__column-link:hover { color: var(--gold-lt); }
+  .footer__column-link { font-size: 0.88rem; color: #A8A29A; text-decoration: none; transition: color 0.2s; }
+  .footer__column-link:hover { color: #FFF; }
   
-  .footer__contact-strip { background: #110F0E; border: 1px solid rgba(184, 148, 42, 0.08); border-radius: var(--radius-lg); padding: 2rem; max-width: 1200px; margin: 0 auto 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .footer__contact-strip { background: #1F1B18; border: 1px solid rgba(184, 148, 42, 0.12); border-radius: var(--radius-lg); padding: 2rem; max-width: 1200px; margin: 0 auto 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
   .footer__strip-item { display: flex; align-items: center; gap: 1rem; }
-  .footer__strip-icon-wrapper { width: 44px; height: 44px; border-radius: var(--radius); background: #1A1715; border: 1px solid rgba(184,148,42,0.15); display: flex; align-items: center; justify-content: center; color: var(--gold-lt); }
+  .footer__strip-icon-wrapper { width: 44px; height: 44px; border-radius: var(--radius); background: var(--ink); border: 1px solid rgba(184,148,42,0.15); display: flex; align-items: center; justify-content: center; color: var(--gold-lt); }
   .footer__strip-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 2px; font-weight: 700; }
   .footer__strip-value { font-size: 0.92rem; color: #FFF; text-decoration: none; }
 
-  /* UI Actions buttons */
-  .btn-premium-gold { display: inline-flex; align-items: center; justify-content: center; font-family: var(--ff-sans); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: #111; font-weight: 600; padding: 14px 32px; border: none; border-radius: var(--radius); cursor: pointer; background: linear-gradient(135deg, #E8D48A 0%, #B8942A 100%); transition: transform 0.3s, box-shadow 0.3s; width: 100%; }
-  .btn-premium-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184, 148, 42, 0.4); }
+  /* Interactive Utility Actions buttons */
+  .btn-premium-gold { display: inline-flex; align-items: center; justify-content: center; font-family: var(--ff-sans); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: #FFF; font-weight: 600; padding: 14px 32px; border: none; border-radius: var(--radius); cursor: pointer; background: var(--ink); transition: transform 0.3s, box-shadow 0.3s; width: 100%; }
+  .btn-premium-gold:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  
   .btn-wa-large { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: var(--radius); background: #25D366; color: #FFF; border: none; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; text-decoration: none; cursor: pointer; }
-  .btn-wa-large:hover { background: #20BA56; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37,211,102,0.3); }
-  .btn-delete { font-family: var(--ff-sans); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #FF4D4D; background: rgba(255,77,77,0.06); border: 1px solid rgba(255,77,77,0.25); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; margin-top: 1rem; width: 100%; }
-  .btn-delete:hover { background: #FF4D4D; color: #FFF; }
+  .btn-wa-large:hover { background: #20BA56; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37,211,102,0.25); }
+  
+  .btn-delete { font-family: var(--ff-sans); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #CC3333; background: rgba(204,51,51,0.05); border: 1px solid rgba(204,51,51,0.2); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; margin-top: 1rem; width: 100%; transition: var(--transition); }
+  .btn-delete:hover { background: #CC3333; color: #FFF; }
 
   .fab-wrap { position:fixed; bottom:2rem; right:2rem; z-index:99; }
-  .fab { display:flex; align-items:center; gap:8px; background: linear-gradient(135deg,#1FAD54,#25D366); color:#FFF; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; padding:14px 24px; border-radius:100px; font-weight:600; box-shadow:0 4px 20px rgba(37,211,102,0.35); }
+  .fab { display:flex; align-items:center; gap:8px; background: linear-gradient(135deg,#1FAD54,#25D366); color:#FFF; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; padding:14px 24px; border-radius:100px; font-weight:600; box-shadow:0 4px 20px rgba(37,211,102,0.2); }
 
   .section-head { text-align:center; margin-bottom:4rem; }
-  .section-head__title { font-family: var(--ff-display); font-size: clamp(2.4rem, 4.5vw, 3.2rem); background: linear-gradient(135deg, #FFF 40%, var(--gold-lt) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .section-head__title { font-family: var(--ff-display); font-size: clamp(2.4rem, 4.5vw, 3.2rem); color: var(--ink); font-weight: 400; }
 
   @media (max-width: 992px) {
     .about__layout { grid-template-columns: 1fr; gap: 2.5rem; text-align: center; }
@@ -190,7 +206,7 @@ const WaIcon = () => (
 );
 
 /* ══════════════════════════════════════════════════════════════
-   UPGRADED ALGORITHM: LIQUID SILK WAVES OVERLAY
+   ALGORITHM: LIQUID CHAMPAIGN SILK WAVE VECTOR ENGINE
 ══════════════════════════════════════════════════════════════ */
 function LuxuryBackground() {
   const canvasRef = useRef(null);
@@ -208,10 +224,11 @@ function LuxuryBackground() {
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
 
+    // Three cascading layered waves colored with premium transparent gold/champagne lines
     let lines = [
-      { y: height * 0.3, speed: 0.004, amplitude: 45, wavelength: 0.003, color: "rgba(184, 148, 42, 0.04)" },
-      { y: height * 0.5, speed: 0.006, amplitude: 65, wavelength: 0.002, color: "rgba(232, 212, 138, 0.03)" },
-      { y: height * 0.7, speed: 0.003, amplitude: 50, wavelength: 0.004, color: "rgba(122, 95, 16, 0.05)" }
+      { y: height * 0.32, speed: 0.005, amplitude: 40, wavelength: 0.0025, color: "rgba(184, 148, 42, 0.06)" },
+      { y: height * 0.52, speed: 0.007, amplitude: 55, wavelength: 0.0018, color: "rgba(232, 212, 138, 0.05)" },
+      { y: height * 0.72, speed: 0.004, amplitude: 45, wavelength: 0.0032, color: "rgba(184, 148, 42, 0.07)" }
     ];
     let count = 0;
 
@@ -222,24 +239,23 @@ function LuxuryBackground() {
       lines.forEach((line) => {
         ctx.beginPath();
         for (let i = 0; i < width; i += 2) {
-          // Compute sine topography
           let sineOffset = Math.sin(i * line.wavelength + count * line.speed);
           let yPos = line.y + sineOffset * line.amplitude;
 
-          // Mouse warp interaction tracking
+          // Localized mouse proximity distortion warp
           let dx = mouse.x - i;
           let dy = mouse.y - yPos;
           let distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < 250) {
-            let pushForce = (1 - distance / 250) * 45;
-            yPos += (dy / (distance || 1)) * -pushForce;
+          if (distance < 240) {
+            let force = (1 - distance / 240) * 40;
+            yPos += (dy / (distance || 1)) * -force;
           }
 
           if (i === 0) ctx.moveTo(i, yPos);
           else ctx.lineTo(i, yPos);
         }
         ctx.strokeStyle = line.color;
-        ctx.lineWidth = 3.5;
+        ctx.lineWidth = 3;
         ctx.stroke();
       });
 
@@ -266,7 +282,7 @@ export default function App() {
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  /* URL Routing Watcher Hook */
+  /* URL Synchronizer Detail Router Mapping Function */
   useEffect(() => {
     const syncRoute = () => {
       const id = new URLSearchParams(window.location.search).get("product");
@@ -329,7 +345,7 @@ export default function App() {
     return (
       <div className="loader">
         <style>{css}</style>
-        <h1 style={{ color: "var(--gold-lt)", fontFamily: "var(--ff-display)", letterSpacing: "0.12em" }}>MaaTarang</h1>
+        <h1 style={{ color: "var(--gold)", fontFamily: "var(--ff-display)", letterSpacing: "0.12em" }}>MaaTarang</h1>
       </div>
     );
   }
@@ -356,16 +372,16 @@ export default function App() {
         </ul>
       </nav>
 
-      {/* ── Admin Login Overlay Panel ── */}
+      {/* ── High-Priority Secure Admin Login Modal Panel ── */}
       {showAdminModal && (
         <div className="modal-overlay" onClick={() => setShowAdminModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal__title">Admin Verification</h2>
-            <p className="modal__sub">Enter security credential key</p>
+            <p className="modal__sub">Enter security credential key to edit data matrix</p>
             <div className="field-wrap">
               <input 
                 type="password" 
-                placeholder="Secure Key" 
+                placeholder="Secure Code" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && verifyPasskey()} 
@@ -378,33 +394,33 @@ export default function App() {
         </div>
       )}
 
-      {/* ── Active Admin Operations Control Desk ── */}
+      {/* ── Active Admin Control Operations Desk ── */}
       {isAdmin && (
         <div className="admin-panel">
-          <h2 className="admin-panel__title">⚙️ Admin Control Board</h2>
-          <div className="admin__row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <h2 className="admin-panel__title">⚙️ Admin Operations Board</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div className="field-wrap">
-              <label className="field-label">Design Title</label>
+              <label className="field-label">Design Name</label>
               <input type="text" placeholder="e.g. Bridal Blouse" value={newName} onChange={e => setNewName(e.target.value)} className="field" />
             </div>
             <div className="field-wrap">
-              <label className="field-label">Price Indicator (₹)</label>
+              <label className="field-label">Price (₹)</label>
               <input type="number" placeholder="e.g. 2500" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="field" />
             </div>
           </div>
           <div className="field-wrap">
-            <label className="field-label">Category Filter Tag</label>
+            <label className="field-label">Category Group Filter Tag</label>
             <input type="text" placeholder="e.g. Maggam Embroidery" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="field" />
           </div>
           <div className="field-wrap">
-            <label className="field-label">Upload High-Res Media</label>
+            <label className="field-label">Upload Product Image File</label>
             <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} className="field" />
           </div>
           <button 
             className="btn-premium-gold" 
             disabled={uploading}
             onClick={async () => {
-              if (!newName || !newPrice || !newCategory || !imageFile) return alert("Please populate all text blocks and images.");
+              if (!newName || !newPrice || !newCategory || !imageFile) return alert("Please populate all text inputs and link images.");
               setUploading(true);
               try {
                 const fd = new FormData(); fd.append("image", imageFile);
@@ -415,17 +431,17 @@ export default function App() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ name: newName, price: Number(newPrice), category: newCategory, image: upData.imageUrl }),
                 });
-                alert("Design loaded perfectly ✓");
+                alert("Design created and loaded perfectly ✓");
                 window.location.reload();
-              } catch { alert("Data save failed."); } finally { setUploading(false); }
+              } catch { alert("Data save operation aborted."); } finally { setUploading(false); }
             }}
           >
-            {uploading ? "Saving Matrix..." : "Inject New Product"}
+            {uploading ? "Uploading Architecture..." : "Inject Design Matrix"}
           </button>
         </div>
       )}
 
-      {/* ── Hero Matrix ── */}
+      {/* ── Hero Presentation Section ── */}
       <section className="hero">
         <span className="hero__eyebrow">Handcrafted in India</span>
         <h1 className="hero__title">Wear the art of <br /><em>timeless craft</em></h1>
@@ -436,7 +452,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Products Display Collection ── */}
+      {/* ── Products Display Grid Collection ── */}
       <section className="products" id="products">
         <div className="section-head reveal">
           <h2 className="section-head__title">Featured Collections</h2>
@@ -457,11 +473,11 @@ export default function App() {
                     className="btn-delete"
                     onClick={async (e) => {
                       e.stopPropagation();
-                      if (!window.confirm(`Permanently remove "${product.name}"?`)) return;
+                      if (!window.confirm(`Permanently remove "${product.name}" from database?`)) return;
                       try {
                         await fetch(`${API_URL}/products/${product._id || product.id}`, { method: "DELETE" });
                         window.location.reload();
-                      } catch { alert("Deletion failed."); }
+                      } catch { alert("Deletion protocol dropped."); }
                     }}
                   >✕ Remove Design</button>
                 )}
@@ -471,7 +487,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Dynamic Route Product Detail Overlay View ── */}
+      {/* ── URL Parameter Product Detail View Overlay ── */}
       {selectedProduct && (
         <div className="detail-view" onClick={(e) => e.target === e.currentTarget && popDetailRoute()}>
           <div className="detail-card">
@@ -480,9 +496,9 @@ export default function App() {
               <img src={selectedProduct.image} alt={selectedProduct.name} className="detail__img" />
             </div>
             <div className="detail__content">
-              <span style={{ fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--gold-lt)" }}>{selectedProduct.category}</span>
-              <h2 style={{ fontFamily: "var(--ff-serif)", fontSize: "2.2rem", margin: "0.5rem 0 1.5rem", fontWeight: "400" }}>{selectedProduct.name}</h2>
-              <div style={{ fontFamily: "var(--ff-display)", fontSize: "2.5rem", color: "var(--gold-shine)", marginBottom: "2rem" }}>₹{selectedProduct.price}/-</div>
+              <span style={{ fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--gold-dk)", fontWeight: "700" }}>{selectedProduct.category}</span>
+              <h2 style={{ fontFamily: "var(--ff-serif)", fontSize: "2.2rem", margin: "0.5rem 0 1.5rem", fontWeight: "400", color: "var(--ink)" }}>{selectedProduct.name}</h2>
+              <div style={{ fontFamily: "var(--ff-display)", fontSize: "2.5rem", color: "var(--teal)", marginBottom: "2rem" }}>₹{selectedProduct.price}/-</div>
               <p style={{ color: "var(--ink-lt)", lineHeight: "1.8", marginBottom: "2.5rem", fontSize: "0.95rem" }}>
                 This masterpiece is carefully configured and fully handcrafted to individual measurement specifications. Features premium traditional textile work tailored exclusively by senior artisans.
               </p>
@@ -497,7 +513,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ── Upgraded Editorial Layout About ── */}
+      {/* ── Editorial Story Panel ── */}
       <section className="about" id="about">
         <div className="about__layout reveal">
           <div>
@@ -511,12 +527,12 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Multi-Column Premium Luxury Footer ── */}
+      {/* ── Premium High-End Footer Layout ── */}
       <footer className="footer-premium" id="contact">
         <div className="footer__grid-columns">
           <div>
             <div className="footer__brand-title">MaaTarang</div>
-            <p style={{ fontSize: "0.85rem", color: "var(--ink-lt)", lineHeight: "1.6" }}>Luxury textiles and artisanal creations configured for discerning wardrobes.</p>
+            <p style={{ fontSize: "0.85rem", color: "#A8A29A", lineHeight: "1.6" }}>Luxury textiles and artisanal creations configured for discerning wardrobes.</p>
           </div>
           <div>
             <h4 className="footer__column-title">Company</h4>
@@ -547,7 +563,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Info Contact Ribbon Blocks */}
+        {/* Info Contact Strip Blocks */}
         <div className="footer__contact-strip">
           <div className="footer__strip-item">
             <div className="footer__strip-icon-wrapper">📞</div>
@@ -571,7 +587,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        <p style={{ textAlign: "center", fontSize: "0.65rem", color: "#444" }}>© 2026 MAATARANG. ALL RIGHTS RESERVED.</p>
+        <p style={{ textAlign: "center", fontSize: "0.65rem", color: "#555" }}>© 2026 MAATARANG. ALL RIGHTS RESERVED.</p>
       </footer>
 
       <div className="fab-wrap">
