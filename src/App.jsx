@@ -1,12 +1,9 @@
-import { useState } from "react";        // already there
-import { useAuth } from "./AuthContext";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useAuth, API_URL } from "./AuthContext";
 import AuthModal from "./AuthModal";
 import WelcomeCouponModal from "./WelcomeCouponModal";
 import AdminCoupons from "./AdminCoupons";
-import { useEffect, useState, useRef, useCallback } from "react";
 import logo from "./assets/logo.png";
-
-const API_URL = "https://maatarang-backend.onrender.com";
 
 /* ═══════════════════════════════════════════════════════════════
    CSS  — all styles including every 3D / animation effect
@@ -1114,7 +1111,7 @@ export default function App() {
   const [imageFile, setImageFile]   = useState(null);
   const [showAdmin, setShowAdmin]   = useState(false);
   const [password, setPassword]     = useState("");
-  const [isAdmin, setIsAdmin]       = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [menuOpen, setMenuOpen]     = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [uploading, setUploading]   = useState(false);
@@ -1128,7 +1125,7 @@ export default function App() {
     const load = () => {
       fetch(`${API_URL}/products`)
         .then((r) => r.json())
-        .then((d) => { setProducts(d); setLoading(false); })
+        .then((d) => { setProducts(d.products ?? d); setLoading(false); })
         .catch(() => setTimeout(load, 3000));
     };
     load();
@@ -1155,7 +1152,7 @@ export default function App() {
   /* ── Admin login helper ── */
   const doLogin = useCallback(() => {
     if (password === "Bunny@MaaTarang") {
-      setIsAdmin(true); setShowAdmin(false); setPassword("");
+      setShowAdminPanel(true); setShowAdmin(false); setPassword("");
     } else {
       alert("Incorrect password. Please try again.");
     }
@@ -1199,7 +1196,20 @@ export default function App() {
           <li><a href="#products" className="nav__link">Collection</a></li>
           <li><a href="#about" className="nav__link">About</a></li>
           <li><a href="#contact" className="nav__link">Contact</a></li>
-          <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
+          {user ? (
+            <>
+              <li><span style={{fontSize:"0.7rem",color:"var(--ink-lt)",letterSpacing:"0.05em"}}>Hi, {user.name}</span></li>
+              {isAdmin && (
+                <li><button className="nav__btn" onClick={() => setShowAdminCoupons(true)}>Coupons</button></li>
+              )}
+              {isAdmin && (
+                <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
+              )}
+              <li><button className="nav__btn" onClick={logout}>Sign Out</button></li>
+            </>
+          ) : (
+            <li><button className="nav__btn" onClick={() => setShowAuthModal(true)}>Sign In</button></li>
+          )}
         </ul>
         <button
           className={`nav__hamburger${menuOpen ? " open" : ""}`}
@@ -1210,7 +1220,6 @@ export default function App() {
         </button>
       </nav>
 
-      {/* Mobile menu */}
       <ul className={`nav__mobile${menuOpen ? " open" : ""}`}>
         {["Home", "Collection", "About", "Contact"].map((item) => (
           <li key={item}>
@@ -1221,11 +1230,35 @@ export default function App() {
             >{item}</a>
           </li>
         ))}
-        <li>
-          <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
-            Admin
-          </button>
-        </li>
+        {user ? (
+          <>
+            {isAdmin && (
+              <li>
+                <button className="nav__btn" onClick={() => { setShowAdminCoupons(true); setMenuOpen(false); }}>
+                  Coupons
+                </button>
+              </li>
+            )}
+            {isAdmin && (
+              <li>
+                <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
+                  Admin
+                </button>
+              </li>
+            )}
+            <li>
+              <button className="nav__btn" onClick={() => { logout(); setMenuOpen(false); }}>
+                Sign Out
+              </button>
+            </li>
+          </>
+        ) : (
+          <li>
+            <button className="nav__btn" onClick={() => { setShowAuthModal(true); setMenuOpen(false); }}>
+              Sign In
+            </button>
+          </li>
+        )}
       </ul>
 
       {/* ── Admin Login Modal ── */}
@@ -1255,7 +1288,7 @@ export default function App() {
       )}
 
       {/* ── Admin Dashboard ── */}
-      {isAdmin && (
+      {showAdminPanel && isAdmin && (
         <div className="admin">
           <div className="admin__header">
             <div className="admin__icon">⚙️</div>
@@ -1300,11 +1333,16 @@ export default function App() {
                 try {
                   const formData = new FormData();
                   formData.append("image", imageFile);
-                  const uploadRes = await fetch(`${API_URL}/upload`, { method: "POST", body: formData });
+                  const token = localStorage.getItem("mt_token");
+                  const uploadRes = await fetch(`${API_URL}/upload`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData,
+                  });
                   const uploadData = await uploadRes.json();
                   await fetch(`${API_URL}/products`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                     body: JSON.stringify({
                       name: newName, price: Number(newPrice),
                       category: newCategory, image: uploadData.imageUrl,
@@ -1663,6 +1701,35 @@ export default function App() {
           <WaIcon /> WhatsApp Us
         </a>
       </div>
+
+      {/* ── Auth Modal ── */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onWelcomeCoupon={(coupon) => { setWelcomeCoupon(coupon); }}
+        />
+      )}
+
+      {/* ── Welcome Coupon Modal ── */}
+      {welcomeCoupon && (
+        <WelcomeCouponModal
+          coupon={welcomeCoupon}
+          onClose={() => setWelcomeCoupon(null)}
+        />
+      )}
+
+      {/* ── Admin Coupons Modal ── */}
+      {showAdminCoupons && isAdmin && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminCoupons(false)}>
+          <div className="modal" style={{ maxWidth: 800, width: "95%", maxHeight: "90vh", overflowY: "auto", padding: "2rem" }}>
+            <button className="modal__close" onClick={() => setShowAdminCoupons(false)}
+              style={{ position:"sticky", top:0, float:"right", background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"var(--ink-lt)" }}>
+              ✕
+            </button>
+            <AdminCoupons />
+          </div>
+        </div>
+      )}
     </>
   );
 }
