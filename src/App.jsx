@@ -1,3 +1,8 @@
+import { useState } from "react";        // already there
+import { useAuth } from "./AuthContext";
+import AuthModal from "./AuthModal";
+import WelcomeCouponModal from "./WelcomeCouponModal";
+import AdminCoupons from "./AdminCoupons";
 import { useEffect, useState, useRef, useCallback } from "react";
 import logo from "./assets/logo.png";
 
@@ -1113,6 +1118,10 @@ export default function App() {
   const [menuOpen, setMenuOpen]     = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [uploading, setUploading]   = useState(false);
+  const { user, logout, isAdmin } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [welcomeCoupon, setWelcomeCoupon] = useState(null);
+  const [showAdminCoupons, setShowAdminCoupons] = useState(false);
 
   /* ── Data fetch ── */
   useEffect(() => {
