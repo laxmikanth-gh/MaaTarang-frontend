@@ -1203,10 +1203,7 @@ export default function App() {
   const [menuOpen, setMenuOpen]     = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [uploading, setUploading]   = useState(false);
-  const { user, logout, isAdmin, token } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [welcomeCoupon, setWelcomeCoupon] = useState(null);
-  const [showAdminCoupons, setShowAdminCoupons] = useState(false);
+
 
   /* ── Data fetch ── */
   useEffect(() => {
@@ -1277,22 +1274,7 @@ export default function App() {
           <li><a href="#products" className="nav__link">Collection</a></li>
           <li><a href="#about" className="nav__link">About</a></li>
           <li><a href="#contact" className="nav__link">Contact</a></li>
-          <li>
-            {user ? (
-              <div className="nav__user">
-                <div className="nav__user-avatar">{user.name.charAt(0).toUpperCase()}</div>
-                <span className="nav__user-name">{user.name.split(" ")[0]}</span>
-                {isAdmin && (
-                  <button className="nav__btn" onClick={() => setShowAdminCoupons(!showAdminCoupons)}>
-                    🎟️ Coupons
-                  </button>
-                )}
-                <button className="nav__logout" onClick={logout}>Sign Out</button>
-              </div>
-            ) : (
-              <button className="nav__btn" onClick={() => setShowAuthModal(true)}>Sign In</button>
-            )}
-          </li>
+          <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
         </ul>
         <button
           className={`nav__hamburger${menuOpen ? " open" : ""}`}
@@ -1315,28 +1297,36 @@ export default function App() {
           </li>
         ))}
         <li>
-          {user ? (
-            <button className="nav__logout" onClick={() => { logout(); setMenuOpen(false); }}>Sign Out</button>
-          ) : (
-            <button className="nav__btn" onClick={() => { setShowAuthModal(true); setMenuOpen(false); }}>Sign In</button>
-          )}
+          <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
+            Admin
+          </button>
         </li>
       </ul>
 
-      {/* ── Auth Modal ── */}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onWelcomeCoupon={(coupon) => setWelcomeCoupon(coupon)}
-        />
-      )}
-
-      {/* ── Welcome Coupon Modal ── */}
-      {welcomeCoupon && (
-        <WelcomeCouponModal
-          coupon={welcomeCoupon}
-          onClose={() => setWelcomeCoupon(null)}
-        />
+      {/* ── Admin Login Modal ── */}
+      {showAdmin && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdmin(false)}>
+          <div className="modal">
+            <div className="modal__icon">🔐</div>
+            <h2 className="modal__title">Admin Access</h2>
+            <p className="modal__sub">Enter credentials to continue</p>
+            <div className="modal__divider" />
+            <div className="field-wrap">
+              <label className="field-label">Password</label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") doLogin(); }}
+                className="field"
+                autoFocus
+              />
+            </div>
+            <button className="btn-primary" onClick={doLogin}>Sign In</button>
+            <button className="btn-ghost" onClick={() => setShowAdmin(false)}>Cancel</button>
+          </div>
+        </div>
       )}
 
       {/* ── Admin Dashboard ── */}
@@ -1419,11 +1409,7 @@ export default function App() {
       )}
 
       {/* ── Admin Coupon Panel ── */}
-      {isAdmin && showAdminCoupons && (
-        <div style={{ padding: "0 5% 2rem" }}>
-          <AdminCoupons />
-        </div>
-      )}
+
 
       {/* ── Hero ── */}
       <section className="hero">
