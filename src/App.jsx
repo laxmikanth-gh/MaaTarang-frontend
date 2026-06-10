@@ -64,36 +64,58 @@ const css = `
   .loader {
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    background: var(--ink); position: relative; overflow: hidden;
+    background: var(--cream); position: relative; overflow: hidden;
   }
   .loader::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(184,148,42,0.14), transparent);
+    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(184,148,42,0.08), transparent);
+  }
+  .loader__logo-wrap {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2.5rem;
   }
   .loader__logo {
-    width: 90px; height: 90px; object-fit: contain;
-    filter: brightness(10) sepia(1) saturate(3) hue-rotate(5deg);
-    opacity: 0.9; margin-bottom: 2rem;
+    width: 220px; object-fit: contain;
     animation: loaderFloat 3s ease-in-out infinite;
+    position: relative; z-index: 2;
   }
-  .loader__title {
-    font-family: var(--ff-display); font-size: 3.2rem; font-weight: 400;
-    letter-spacing: 0.12em; color: var(--gold-lt); margin-bottom: 0.5rem;
-    animation: fadeInUp 0.8s ease both;
+  .loader__ring {
+    position: absolute;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: var(--gold);
+    border-right-color: rgba(184,148,42,0.3);
+    animation: spinRing 1.4s linear infinite;
+  }
+  .loader__ring-2 {
+    position: absolute;
+    width: 290px; height: 290px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-bottom-color: var(--gold-lt);
+    border-left-color: rgba(184,148,42,0.2);
+    animation: spinRing 2.2s linear infinite reverse;
   }
   .loader__sub {
-    font-size: 0.72rem; letter-spacing: 0.35em; text-transform: uppercase;
-    color: rgba(232,212,138,0.5); margin-bottom: 3rem;
+    font-size: 0.68rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--ink-lt); margin-bottom: 2rem;
     animation: fadeInUp 0.8s 0.15s ease both;
   }
-  .loader__bar { width: 180px; height: 1px; background: rgba(184,148,42,0.2); border-radius: 4px; overflow: hidden; }
-  .loader__bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold-dk), var(--gold-shine), var(--gold-dk));
-    background-size: 200% 100%; animation: shimmerBar 1.8s linear infinite; border-radius: 4px;
+  .loader__dots {
+    display: flex; gap: 8px; align-items: center;
   }
-  @keyframes loaderFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-10px) scale(1.03)} }
-  @keyframes shimmerBar  { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .loader__dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    animation: dotPulse 1.4s ease-in-out infinite;
+  }
+  .loader__dot:nth-child(2) { animation-delay: 0.2s; background: var(--gold-lt); }
+  .loader__dot:nth-child(3) { animation-delay: 0.4s; background: var(--gold-dk); }
+
+  @keyframes loaderFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes spinRing    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes dotPulse    { 0%,100%{transform:scale(1);opacity:0.4} 50%{transform:scale(1.5);opacity:1} }
   @keyframes fadeInUp    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
   /* ══════════════════════
@@ -1257,10 +1279,17 @@ export default function App() {
       <>
         <style>{css}</style>
         <div className="loader">
-          <img src={logo} alt="MaaTarang" className="loader__logo" />
-          <h1 className="loader__title">MaaTarang</h1>
+          <div className="loader__logo-wrap">
+            <div className="loader__ring-2" />
+            <div className="loader__ring" />
+            <img src={logo} alt="MaaTarang" className="loader__logo" />
+          </div>
           <p className="loader__sub">Preparing your collection</p>
-          <div className="loader__bar"><div className="loader__bar-fill" /></div>
+          <div className="loader__dots">
+            <div className="loader__dot" />
+            <div className="loader__dot" />
+            <div className="loader__dot" />
+          </div>
         </div>
       </>
     );
