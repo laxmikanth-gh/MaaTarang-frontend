@@ -1,13 +1,23 @@
 import { useEffect, useState, useCallback } from "react";
 import logo from "./assets/logo.png";
 
-const API_URL = "https://maatarang-backend.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://maatarang-backend.onrender.com";
+const ADMIN_PASSWORD = "Bunny@MaaTarang";
 
-/* ═══════════════════════════════════════════════════════════════
-   CSS  — all styles including every 3D / animation effect
-═══════════════════════════════════════════════════════════════ */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  .modal-overlay { position:fixed;inset:0;background:rgba(26,20,16,0.7);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);animation:fadeIn 0.2s ease; }
+  .modal { background:var(--white);width:90%;max-width:400px;border-radius:var(--radius-lg);padding:2.75rem;box-shadow:var(--shadow-lg);animation:modalUp 0.3s cubic-bezier(0.34,1.56,0.64,1);border:1px solid rgba(184,148,42,0.12);position:relative; }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+  @keyframes modalUp { from{transform:translateY(24px) scale(0.96);opacity:0} to{transform:translateY(0) scale(1);opacity:1} }
+  .modal__close { position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:0.85rem;color:var(--ink-lt);cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);transition:color 0.2s,background 0.2s; }
+  .modal__close:hover { color:var(--ink);background:rgba(26,20,16,0.06); }
+  .modal__icon { width:52px;height:52px;border-radius:50%;background:rgba(184,148,42,0.1);border:1px solid rgba(184,148,42,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;font-size:1.4rem; }
+  .modal__title { font-family:var(--ff-serif);font-size:1.8rem;font-weight:500;color:var(--ink);margin-bottom:0.4rem; }
+  .modal__sub { font-size:0.8rem;color:var(--ink-lt);letter-spacing:0.05em;margin-bottom:2rem; }
+  .modal__divider { width:36px;height:1.5px;background:linear-gradient(90deg,var(--gold),var(--gold-lt));margin-bottom:1.75rem;border-radius:2px; }
+  .auth-error { background:rgba(184,50,50,0.08);border:1px solid rgba(184,50,50,0.2);color:#B83232;border-radius:var(--radius);padding:10px 14px;font-size:0.8rem;margin-bottom:0.75rem;letter-spacing:0.02em; }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -745,98 +755,6 @@ const css = `
     .card { transform-style:flat; }
     .hero__title { animation:fadeInUp 0.7s 0.2s ease both; }
   }
-
-  /* ══════════════════════
-     AUTH & COUPON STYLES
-  ══════════════════════ */
-  .modal { position:relative; }
-  .modal__close {
-    position:absolute;top:1rem;right:1rem;background:none;border:none;
-    font-size:0.85rem;color:var(--ink-lt);cursor:pointer;padding:4px 8px;
-    border-radius:var(--radius-sm);transition:color 0.2s,background 0.2s;
-  }
-  .modal__close:hover { color:var(--ink);background:rgba(26,20,16,0.06); }
-
-  .auth-error {
-    background:rgba(184,50,50,0.08);border:1px solid rgba(184,50,50,0.2);
-    color:#B83232;border-radius:var(--radius);padding:10px 14px;
-    font-size:0.8rem;margin-bottom:0.75rem;letter-spacing:0.02em;
-  }
-  .auth-success {
-    background:rgba(15,110,86,0.08);border:1px solid rgba(15,110,86,0.2);
-    color:var(--teal-dk);border-radius:var(--radius);padding:10px 14px;
-    font-size:0.8rem;margin-bottom:0.75rem;letter-spacing:0.02em;
-  }
-
-  .coupon-modal { text-align:center; }
-  .coupon-confetti { font-size:2.8rem;margin-bottom:1rem;animation:confettiBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
-  @keyframes confettiBounce { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0)} }
-
-  .coupon-code-box {
-    background:var(--ink);border-radius:var(--radius);padding:18px 24px;
-    margin:0 auto 1rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;
-    border:1px solid rgba(184,148,42,0.3);box-shadow:var(--shadow-gold);
-  }
-  .coupon-code-box:hover { transform:translateY(-2px);box-shadow:0 8px 32px rgba(184,148,42,0.3); }
-  .coupon-code-text {
-    display:block;font-family:var(--ff-display);font-size:1.9rem;
-    letter-spacing:0.18em;color:var(--gold-lt);text-shadow:0 0 20px rgba(184,148,42,0.4);
-  }
-  .coupon-copy-hint { display:block;font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(232,212,138,0.5);margin-top:4px; }
-  .coupon-note { font-size:0.78rem;color:var(--ink-lt);line-height:1.7;margin-top:0.5rem; }
-
-  .nav__user { display:flex;align-items:center;gap:0.75rem; }
-  .nav__user-name { font-size:0.72rem;letter-spacing:0.1em;color:var(--ink-md);font-weight:500;text-transform:uppercase; }
-  .nav__user-avatar {
-    width:34px;height:34px;border-radius:50%;
-    background:linear-gradient(135deg,var(--gold-dk),var(--gold));
-    display:flex;align-items:center;justify-content:center;
-    font-size:0.75rem;color:var(--white);font-weight:600;letter-spacing:0.05em;
-    box-shadow:0 2px 8px rgba(184,148,42,0.3);
-  }
-  .nav__logout {
-    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.16em;text-transform:uppercase;
-    color:var(--ink-lt);background:transparent;border:1px solid rgba(184,148,42,0.25);
-    padding:6px 14px;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);font-weight:500;
-  }
-  .nav__logout:hover { color:#B83232;border-color:rgba(184,50,50,0.4);background:rgba(184,50,50,0.04); }
-
-  .admin-check-label { display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--ink-md);cursor:pointer;font-weight:500;letter-spacing:0.06em; }
-  .admin-check-label input[type="checkbox"] { accent-color:var(--gold);width:15px;height:15px;cursor:pointer; }
-
-  .coupon-row {
-    background:var(--cream);border:1px solid rgba(184,148,42,0.12);
-    border-radius:var(--radius);padding:14px 18px;
-    display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem;transition:border-color 0.2s;
-  }
-  .coupon-row:hover { border-color:rgba(184,148,42,0.3); }
-  .coupon-row__left { display:flex;align-items:center;gap:0.6rem;flex:1; }
-  .coupon-row__code { font-family:var(--ff-display);font-size:1rem;color:var(--ink);letter-spacing:0.1em; }
-  .coupon-row__badge {
-    font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;
-    background:rgba(184,148,42,0.1);color:var(--gold-dk);
-    border:1px solid rgba(184,148,42,0.2);padding:3px 10px;border-radius:100px;font-weight:600;
-  }
-  .coupon-row__tag {
-    font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;
-    background:rgba(15,110,86,0.08);color:var(--teal-dk);
-    border:1px solid rgba(15,110,86,0.18);padding:3px 10px;border-radius:100px;font-weight:600;
-  }
-  .coupon-row__meta { display:flex;gap:1rem;font-size:0.72rem;color:var(--ink-lt);letter-spacing:0.04em; }
-  .coupon-row__actions { display:flex;align-items:center;gap:0.5rem; }
-  .coupon-row__edit {
-    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--gold-dk);background:rgba(184,148,42,0.06);border:1.5px solid rgba(184,148,42,0.25);
-    padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-weight:500;transition:var(--transition);
-  }
-  .coupon-row__edit:hover { background:var(--gold);color:var(--white);border-color:var(--gold); }
-  .coupon-toggle {
-    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;
-    border:1.5px solid;padding:6px 14px;border-radius:100px;cursor:pointer;font-weight:600;transition:var(--transition);
-  }
-  .coupon-toggle.active { background:rgba(15,110,86,0.08);color:var(--teal-dk);border-color:rgba(15,110,86,0.3); }
-  .coupon-toggle.active:hover { background:var(--teal-dk);color:var(--white);border-color:var(--teal-dk); }
-  .coupon-toggle.inactive { background:rgba(107,87,68,0.06);color:var(--ink-lt);border-color:rgba(107,87,68,0.2); }
 `;
 
 /* ── WhatsApp Icon ── */
@@ -1185,32 +1103,37 @@ function CustomDesignForm() {
       <button className="custom__submit" onClick={handleSubmit}>
         <WaIcon /> Send Request on WhatsApp
       </button>
-    </div>
-  );
-}
 
 /* ══════════════════════════════════════════════════════════════
    APP
 ══════════════════════════════════════════════════════════════ */
 export default function App() {
-  const [products, setProducts]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [newName, setNewName]       = useState("");
-  const [newPrice, setNewPrice]     = useState("");
+  const [products, setProducts]       = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [newName, setNewName]         = useState("");
+  const [newPrice, setNewPrice]       = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [imageFile, setImageFile]   = useState(null);
-  const [showAdmin, setShowAdmin]   = useState(false);
-  const [menuOpen, setMenuOpen]     = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
-  const [uploading, setUploading]   = useState(false);
+  const [imageFile, setImageFile]     = useState(null);
+  const [showAdmin, setShowAdmin]     = useState(false);
+  const [password, setPassword]       = useState("");
+  const [isAdmin, setIsAdmin]         = useState(() => localStorage.getItem("mt_is_admin") === "1");
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [scrolled, setScrolled]       = useState(false);
+  const [uploading, setUploading]     = useState(false);
+  const [adminToken, setAdminToken]   = useState(() => localStorage.getItem("mt_admin_token") || "");
+  const [pwError, setPwError]         = useState("");
+  const [editProduct, setEditProduct] = useState(null); // product being edited
+  const [editName, setEditName]       = useState("");
+  const [editPrice, setEditPrice]     = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editSaving, setEditSaving]   = useState(false);
 
-
-  /* ── Data fetch ── */
+  /* ── Products fetch ── */
   useEffect(() => {
     const load = () => {
       fetch(`${API_URL}/products`)
         .then((r) => r.json())
-        .then((d) => { setProducts(d.products || d); setLoading(false); })
+        .then((d) => { setProducts(d.products ?? d); setLoading(false); })
         .catch(() => setTimeout(load, 3000));
     };
     load();
@@ -1223,7 +1146,7 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ── All 3D / animation hooks (run after products load) ── */
+  /* ── 3D / animation hooks ── */
   useScrollReveal([products]);
   useHeroParallax();
   usePillTilt();
@@ -1234,7 +1157,50 @@ export default function App() {
   useTilt(".process__step", 8);
   useHeroCanvas();
 
-  /* ── Admin login helper removed — now handled by JWT auth ── */
+  /* ── Admin login via backend JWT ── */
+  const doLogin = useCallback(async () => {
+    setPwError("");
+    if (!password) { setPwError("Enter your password"); return; }
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "admin@maatarang.in", password }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.user?.role !== "admin") {
+        // fallback: local password check
+        if (password === ADMIN_PASSWORD) {
+          setIsAdmin(true); setShowAdmin(false); setPassword(""); setPwError("");
+          return;
+        }
+        setPwError(data.message || "Invalid password");
+        return;
+      }
+      setAdminToken(data.token);
+      localStorage.setItem("mt_admin_token", data.token);
+      localStorage.setItem("mt_is_admin", "1");
+      setIsAdmin(true); setShowAdmin(false); setPassword(""); setPwError("");
+    } catch {
+      // network fail — fallback to local password
+      if (password === ADMIN_PASSWORD) {
+        localStorage.setItem("mt_is_admin", "1");
+        setIsAdmin(true); setShowAdmin(false); setPassword(""); setPwError("");
+      } else {
+        setPwError("Network error. Please try again.");
+      }
+    }
+  }, [password]);
+
+  const doLogout = () => {
+    setIsAdmin(false);
+    setAdminToken("");
+    localStorage.removeItem("mt_admin_token");
+    localStorage.removeItem("mt_is_admin");
+  };
+
+  /* ── Auth header helper ── */
+  const authHeader = adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
 
   /* ══════════════════════════════════════════════════════
      LOADER
@@ -1274,7 +1240,11 @@ export default function App() {
           <li><a href="#products" className="nav__link">Collection</a></li>
           <li><a href="#about" className="nav__link">About</a></li>
           <li><a href="#contact" className="nav__link">Contact</a></li>
-          <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
+          {isAdmin ? (
+            <li><button className="nav__btn" onClick={doLogout}>Sign Out</button></li>
+          ) : (
+            <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
+          )}
         </ul>
         <button
           className={`nav__hamburger${menuOpen ? " open" : ""}`}
@@ -1285,91 +1255,138 @@ export default function App() {
         </button>
       </nav>
 
-      {/* Mobile menu */}
+      {/* ── Mobile Menu ── */}
       <ul className={`nav__mobile${menuOpen ? " open" : ""}`}>
-        {["Home", "Collection", "About", "Contact"].map((item) => (
+        {["Home","Collection","About","Contact"].map((item) => (
           <li key={item}>
-            <a
-              href={item === "Home" ? "#" : `#${item.toLowerCase()}`}
-              className="nav__link"
-              onClick={() => setMenuOpen(false)}
-            >{item}</a>
+            <a href={item === "Home" ? "#" : `#${item.toLowerCase()}`}
+              className="nav__link" onClick={() => setMenuOpen(false)}>{item}</a>
           </li>
         ))}
         <li>
-          <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
-            Admin
-          </button>
+          {isAdmin ? (
+            <button className="nav__btn" onClick={() => { doLogout(); setMenuOpen(false); }}>Sign Out</button>
+          ) : (
+            <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>Admin</button>
+          )}
         </li>
       </ul>
 
       {/* ── Admin Login Modal ── */}
-      {showAdmin && (
+      {showAdmin && !isAdmin && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdmin(false)}>
-          <div className="modal">
+          <div className="modal" style={{ maxWidth: 380 }}>
+            <button className="modal__close" onClick={() => { setShowAdmin(false); setPassword(""); setPwError(""); }}>✕</button>
             <div className="modal__icon">🔐</div>
             <h2 className="modal__title">Admin Access</h2>
-            <p className="modal__sub">Enter credentials to continue</p>
+            <p className="modal__sub">Enter your admin password</p>
             <div className="modal__divider" />
             <div className="field-wrap">
               <label className="field-label">Password</label>
               <input
                 type="password"
-                placeholder="Enter your password"
+                className="field"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") doLogin(); }}
-                className="field"
+                onKeyDown={(e) => e.key === "Enter" && doLogin()}
                 autoFocus
               />
             </div>
-            <button className="btn-primary" onClick={doLogin}>Sign In</button>
-            <button className="btn-ghost" onClick={() => setShowAdmin(false)}>Cancel</button>
+            {pwError && <div className="auth-error">{pwError}</div>}
+            <button className="btn-primary" onClick={doLogin} style={{ marginTop: "0.5rem" }}>Sign In</button>
+            <button className="btn-ghost" onClick={() => { setShowAdmin(false); setPassword(""); setPwError(""); }}>Cancel</button>
           </div>
         </div>
       )}
 
-      {/* ── Admin Dashboard ── */}
+      {/* ── Edit Product Modal ── */}
+      {editProduct && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setEditProduct(null)}>
+          <div className="modal" style={{ maxWidth: 460 }}>
+            <button className="modal__close" onClick={() => setEditProduct(null)}>✕</button>
+            <div className="modal__icon">✏️</div>
+            <h2 className="modal__title">Edit Product</h2>
+            <p className="modal__sub">Update name, price or category</p>
+            <div className="modal__divider" />
+            <div className="field-wrap">
+              <label className="field-label">Product Name *</label>
+              <input type="text" className="field" value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            <div className="field-wrap">
+              <label className="field-label">Price (₹) *</label>
+              <input type="number" className="field" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} />
+            </div>
+            <div className="field-wrap">
+              <label className="field-label">Category *</label>
+              <input type="text" className="field" value={editCategory} onChange={(e) => setEditCategory(e.target.value)} />
+            </div>
+            <button
+              className="btn-primary"
+              disabled={editSaving}
+              style={{ marginTop: "0.5rem" }}
+              onClick={async () => {
+                if (!editName || !editPrice || !editCategory) { alert("All fields are required"); return; }
+                setEditSaving(true);
+                try {
+                  const res = await fetch(`${API_URL}/products/${editProduct._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", ...authHeader },
+                    body: JSON.stringify({ name: editName, price: Number(editPrice), category: editCategory, image: editProduct.image }),
+                  });
+                  if (!res.ok) { const e = await res.json(); alert(e.message || "Update failed"); return; }
+                  setProducts(prev => prev.map(p => p._id === editProduct._id
+                    ? { ...p, name: editName, price: Number(editPrice), category: editCategory }
+                    : p
+                  ));
+                  setEditProduct(null);
+                } catch { alert("Update failed. Try again."); }
+                finally { setEditSaving(false); }
+              }}
+            >{editSaving ? "Saving…" : "Save Changes"}</button>
+            <button className="btn-ghost" onClick={() => setEditProduct(null)}>Cancel</button>
+          </div>
+        </div>
+      )}
       {isAdmin && (
-        <div className="admin">
+        <div className="admin" style={{ maxWidth: 700, margin: "2.5rem auto" }}>
           <div className="admin__header">
             <div className="admin__icon">⚙️</div>
             <div>
               <h2 className="admin__title">Admin Dashboard</h2>
-              <p className="admin__sub">Manage your collection</p>
+              <p className="admin__sub">Add · Edit · Delete Products</p>
             </div>
           </div>
           <div className="admin__divider" />
           <div className="admin__grid">
             <div className="admin__row">
               <div className="field-wrap">
-                <label className="field-label">Product Name</label>
-                <input type="text" placeholder="e.g. Bridal Blouse" value={newName}
-                  onChange={(e) => setNewName(e.target.value)} className="field" />
+                <label className="field-label">Product Name *</label>
+                <input type="text" className="field" placeholder="e.g. Bridal Blouse"
+                  value={newName} onChange={(e) => setNewName(e.target.value)} />
               </div>
               <div className="field-wrap">
-                <label className="field-label">Price (₹)</label>
-                <input type="number" placeholder="e.g. 2500" value={newPrice}
-                  onChange={(e) => setNewPrice(e.target.value)} className="field" />
+                <label className="field-label">Price (₹) *</label>
+                <input type="number" className="field" placeholder="e.g. 2500"
+                  value={newPrice} onChange={(e) => setNewPrice(e.target.value)} />
               </div>
             </div>
             <div className="field-wrap">
-              <label className="field-label">Category</label>
-              <input type="text" placeholder="e.g. Designer Blouse" value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)} className="field" />
+              <label className="field-label">Category *</label>
+              <input type="text" className="field" placeholder="e.g. Designer Blouse"
+                value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
             </div>
             <div className="field-wrap">
-              <label className="field-label">Product Image</label>
-              <input type="file" accept="image/*"
-                onChange={(e) => setImageFile(e.target.files[0])} className="field" />
+              <label className="field-label">Product Image *</label>
+              <input type="file" accept="image/*" className="field"
+                onChange={(e) => setImageFile(e.target.files[0])} />
             </div>
             <button
               className="btn-primary"
               disabled={uploading}
               onClick={async () => {
                 if (!newName || !newPrice || !newCategory || !imageFile) {
-                  alert("Please fill all fields and select an image.");
-                  return;
+                  alert("Please fill all fields and select an image."); return;
                 }
                 setUploading(true);
                 try {
@@ -1377,39 +1394,37 @@ export default function App() {
                   formData.append("image", imageFile);
                   const uploadRes = await fetch(`${API_URL}/upload`, {
                     method: "POST",
+                    headers: { ...authHeader },
                     body: formData,
-                    headers: { Authorization: `Bearer ${token}` },
                   });
                   const uploadData = await uploadRes.json();
-                  await fetch(`${API_URL}/products`, {
+                  if (!uploadRes.ok) { alert(uploadData.error || "Image upload failed"); return; }
+
+                  const prodRes = await fetch(`${API_URL}/products`, {
                     method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
+                    headers: { "Content-Type": "application/json", ...authHeader },
                     body: JSON.stringify({
                       name: newName, price: Number(newPrice),
                       category: newCategory, image: uploadData.imageUrl,
                     }),
                   });
+                  if (!prodRes.ok) { const e = await prodRes.json(); alert(e.message || "Failed to add product"); return; }
                   alert("Product added successfully ✓");
-                  window.location.reload();
+                  setNewName(""); setNewPrice(""); setNewCategory(""); setImageFile(null);
+                  const d = await fetch(`${API_URL}/products`).then(r => r.json());
+                  setProducts(d.products ?? d);
                 } catch (err) {
-                  console.error(err);
-                  alert("Upload failed. Please try again.");
+                  alert("Upload failed: " + err.message);
                 } finally {
                   setUploading(false);
                 }
               }}
             >
-              {uploading ? "Uploading…" : "Add Product"}
+              {uploading ? "Uploading…" : "➕ Add Product"}
             </button>
           </div>
         </div>
       )}
-
-      {/* ── Admin Coupon Panel ── */}
-
 
       {/* ── Hero ── */}
       <section className="hero">
@@ -1417,7 +1432,6 @@ export default function App() {
         <div className="hero__bg" />
         <div className="hero__ring"><div className="hero__ring-dot" /></div>
         <div className="hero__ring" />
-        {/* Decorative embroidery-inspired motifs */}
         <svg className="hero__motif" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="100" cy="100" r="90" stroke="#B8942A" strokeWidth="1"/>
           <circle cx="100" cy="100" r="70" stroke="#B8942A" strokeWidth="0.5"/>
@@ -1441,34 +1455,20 @@ export default function App() {
           <circle cx="100" cy="100" r="15" stroke="#0F6E56" strokeWidth="1.5"/>
           <circle cx="100" cy="100" r="6" fill="#0F6E56" opacity="0.4"/>
         </svg>
-        <svg className="hero__motif" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {[0,90,180,270].map(a=>(
-            <g key={a} transform={`rotate(${a} 50 50)`}>
-              <path d="M50 5 Q65 30 50 50 Q35 30 50 5" fill="#B8942A"/>
-            </g>
-          ))}
-          <circle cx="50" cy="50" r="8" stroke="#B8942A" strokeWidth="1.5"/>
-        </svg>
         <p className="hero__eyebrow">Handcrafted in India · Est. 2012</p>
-        <h1 className="hero__title">
-          Wear the art of<br />
-          <em>timeless craft</em>
-        </h1>
+        <h1 className="hero__title">Wear the art of<br /><em>timeless craft</em></h1>
         <p className="hero__desc">
           Discover handcrafted embroidery, designer blouses, maggam work,
-          and bespoke creations — each piece a testament to artistry and
-          generations of tradition.
+          and bespoke creations — each piece a testament to artistry and generations of tradition.
         </p>
         <div className="hero__pills">
-          {["Traditional Embroidery", "Maggam Work", "Custom Designs", "Designer Blouses"].map((t) => (
-            <span className="hero__pill" key={t}>
-              <span className="hero__pill-dot" />{t}
-            </span>
+          {["Traditional Embroidery","Maggam Work","Custom Designs","Designer Blouses"].map((t) => (
+            <span className="hero__pill" key={t}><span className="hero__pill-dot" />{t}</span>
           ))}
         </div>
         <div className="hero__cta">
           <a href="https://wa.me/917780646402" target="_blank" rel="noopener noreferrer">
-            <button className="btn-wa" style={{ width: "auto", padding: "13px 32px" }}>
+            <button className="btn-wa" style={{ width:"auto", padding:"13px 32px" }}>
               <WaIcon /> Order on WhatsApp
             </button>
           </a>
@@ -1480,10 +1480,10 @@ export default function App() {
       {/* ── Stats Bar ── */}
       <div className="stats">
         {[
-          { num: "500+", label: "Pieces Created" },
-          { num: "12+",  label: "Years of Craft" },
-          { num: "100%", label: "Handcrafted" },
-          { num: "∞",    label: "Custom Orders" },
+          { num:"500+", label:"Pieces Created" },
+          { num:"12+",  label:"Years of Craft" },
+          { num:"100%", label:"Handcrafted" },
+          { num:"∞",    label:"Custom Orders" },
         ].map((s) => (
           <div className="stats__item" key={s.label}>
             <span className="stats__num">{s.num}</span>
@@ -1506,13 +1506,11 @@ export default function App() {
                 <img src={product.image} alt={product.name} className="card__img" />
                 <span className="card__badge">{product.category}</span>
                 <div className="card__overlay">
-                  <button
-                    className="card__overlay-btn"
+                  <button className="card__overlay-btn"
                     onClick={() => window.open(
                       `https://wa.me/917780646402?text=Hello MaaTarang, I am interested in ${encodeURIComponent(product.name)}`,
                       "_blank"
-                    )}
-                  >Quick Enquire</button>
+                    )}>Quick Enquire</button>
                 </div>
               </div>
               <div className="card__body">
@@ -1524,26 +1522,38 @@ export default function App() {
                   <span className="card__currency">/-</span>
                 </div>
                 <div className="card__divider" />
-                <a
-                  href={`https://wa.me/917780646402?text=Hello MaaTarang, I am interested in ${encodeURIComponent(product.name)}`}
-                  target="_blank" rel="noopener noreferrer"
-                >
+                <a href={`https://wa.me/917780646402?text=Hello MaaTarang, I am interested in ${encodeURIComponent(product.name)}`}
+                  target="_blank" rel="noopener noreferrer">
                   <button className="btn-wa"><WaIcon /> Order on WhatsApp</button>
                 </a>
                 {isAdmin && (
-                  <button
-                    className="btn-delete"
-                    onClick={async () => {
-                      if (!window.confirm(`Delete "${product.name}"?`)) return;
-                      try {
-                        await fetch(`${API_URL}/products/${product._id}`, {
-                          method: "DELETE",
-                          headers: { Authorization: `Bearer ${token}` },
-                        });
-                        window.location.reload();
-                      } catch { alert("Delete failed."); }
-                    }}
-                  >✕ Remove Product</button>
+                  <div style={{ display:"flex", gap:"0.5rem", marginTop:"0.6rem" }}>
+                    <button
+                      style={{ flex:1 }}
+                      className="coupon-row__edit"
+                      onClick={() => {
+                        setEditProduct(product);
+                        setEditName(product.name);
+                        setEditPrice(product.price);
+                        setEditCategory(product.category);
+                      }}
+                    >✏️ Edit</button>
+                    <button
+                      style={{ flex:1, margin:0 }}
+                      className="btn-delete"
+                      onClick={async () => {
+                        if (!window.confirm(`Delete "${product.name}"?`)) return;
+                        try {
+                          const res = await fetch(`${API_URL}/products/${product._id}`, {
+                            method: "DELETE",
+                            headers: { ...authHeader },
+                          });
+                          if (!res.ok) { alert("Delete failed"); return; }
+                          setProducts(prev => prev.filter(p => p._id !== product._id));
+                        } catch { alert("Delete failed."); }
+                      }}
+                    >✕ Remove</button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1551,7 +1561,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Process / How It Works ── */}
+      {/* ── Process ── */}
       <section className="process" id="process">
         <div className="process__inner">
           <div className="section-head reveal">
@@ -1616,16 +1626,9 @@ export default function App() {
         </div>
         <div className="insta__grid">
           {["🪡","✨","🌸","🎨","👗","🪷","💛","🌿","🏵️","✂️","🌺","💎"].map((icon, i) => (
-            <a
-              key={i}
-              className="insta__item"
-              href="https://instagram.com/maatarang"
-              target="_blank" rel="noopener noreferrer"
-            >
+            <a key={i} className="insta__item" href="https://instagram.com/maatarang" target="_blank" rel="noopener noreferrer">
               <div className="insta__item-placeholder">{icon}</div>
-              <div className="insta__item-overlay">
-                <span className="insta__item-icon">📷</span>
-              </div>
+              <div className="insta__item-overlay"><span className="insta__item-icon">📷</span></div>
             </a>
           ))}
         </div>
@@ -1673,7 +1676,6 @@ export default function App() {
             <div className="section-head__line" />
           </div>
           <img src={logo} alt="MaaTarang" className="about__logo reveal" />
-          {/* Words are wrapped into spans by useQuoteFlip for 3D flip */}
           <blockquote className="about__quote">
             Every stitch carries the echo of tradition, every thread a story untold.
           </blockquote>
@@ -1685,9 +1687,9 @@ export default function App() {
           </p>
           <div className="about__features reveal">
             {[
-              { icon: "🪡", title: "Hand Embroidered", desc: "Every piece stitched with care by skilled artisans" },
-              { icon: "✨", title: "Bespoke Designs",  desc: "Custom creations tailored to your vision" },
-              { icon: "🌿", title: "Ethically Made",   desc: "Supporting traditional craft communities" },
+              { icon:"🪡", title:"Hand Embroidered", desc:"Every piece stitched with care by skilled artisans" },
+              { icon:"✨", title:"Bespoke Designs",  desc:"Custom creations tailored to your vision" },
+              { icon:"🌿", title:"Ethically Made",   desc:"Supporting traditional craft communities" },
             ].map((f) => (
               <div className="about__feature" key={f.title}>
                 <span className="about__feature-icon">{f.icon}</span>
@@ -1705,13 +1707,9 @@ export default function App() {
         <div className="footer__name">MaaTarang</div>
         <div className="footer__tagline">Where Tradition Meets Artistry</div>
         <div className="footer__divider" />
-        {/* Social links */}
         <div className="footer__social">
           <a href="https://instagram.com/maatarang" target="_blank" rel="noopener noreferrer" className="footer__social-link" title="Instagram">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a href="https://facebook.com/maatarang" target="_blank" rel="noopener noreferrer" className="footer__social-link" title="Facebook">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           </a>
           <a href="https://wa.me/917780646402" target="_blank" rel="noopener noreferrer" className="footer__social-link" title="WhatsApp">
             <WaIcon />
@@ -1720,7 +1718,6 @@ export default function App() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
           </a>
         </div>
-        {/* Nav links */}
         <nav className="footer__nav">
           {[["Home","#"],["Collection","#products"],["Process","#process"],["About","#about"],["FAQ","#faq"],["Contact","#contact"]].map(([label,href]) => (
             <a key={label} href={href} className="footer__nav-link">{label}</a>
@@ -1728,9 +1725,7 @@ export default function App() {
         </nav>
         <div className="footer__divider" />
         <div className="footer__contact">
-          <a href="https://wa.me/917780646402" className="footer__contact-item">
-            <WaIcon /> +91 77806 46402
-          </a>
+          <a href="https://wa.me/917780646402" className="footer__contact-item"><WaIcon /> +91 77806 46402</a>
           <div className="footer__contact-sep" />
           <a href="mailto:hello@maatarang.in" className="footer__contact-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
@@ -1745,7 +1740,7 @@ export default function App() {
         <p className="footer__copy">© 2026 MaaTarang · All Rights Reserved · Crafted with ❤️</p>
       </footer>
 
-      {/* ── Floating WhatsApp Button with pulse ring ── */}
+      {/* ── Floating WhatsApp Button ── */}
       <div className="fab-wrap">
         <a href="https://wa.me/917780646402" target="_blank" rel="noopener noreferrer" className="fab">
           <WaIcon /> WhatsApp Us
