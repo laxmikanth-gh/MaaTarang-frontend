@@ -1,9 +1,7 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useAuth, API_URL } from "./AuthContext";
-import AuthModal from "./AuthModal";
-import WelcomeCouponModal from "./WelcomeCouponModal";
-import AdminCoupons from "./AdminCoupons";
+import { useEffect, useState, useCallback } from "react";
 import logo from "./assets/logo.png";
+
+const API_URL = "https://maatarang-backend.onrender.com";
 
 /* ═══════════════════════════════════════════════════════════════
    CSS  — all styles including every 3D / animation effect
@@ -747,6 +745,98 @@ const css = `
     .card { transform-style:flat; }
     .hero__title { animation:fadeInUp 0.7s 0.2s ease both; }
   }
+
+  /* ══════════════════════
+     AUTH & COUPON STYLES
+  ══════════════════════ */
+  .modal { position:relative; }
+  .modal__close {
+    position:absolute;top:1rem;right:1rem;background:none;border:none;
+    font-size:0.85rem;color:var(--ink-lt);cursor:pointer;padding:4px 8px;
+    border-radius:var(--radius-sm);transition:color 0.2s,background 0.2s;
+  }
+  .modal__close:hover { color:var(--ink);background:rgba(26,20,16,0.06); }
+
+  .auth-error {
+    background:rgba(184,50,50,0.08);border:1px solid rgba(184,50,50,0.2);
+    color:#B83232;border-radius:var(--radius);padding:10px 14px;
+    font-size:0.8rem;margin-bottom:0.75rem;letter-spacing:0.02em;
+  }
+  .auth-success {
+    background:rgba(15,110,86,0.08);border:1px solid rgba(15,110,86,0.2);
+    color:var(--teal-dk);border-radius:var(--radius);padding:10px 14px;
+    font-size:0.8rem;margin-bottom:0.75rem;letter-spacing:0.02em;
+  }
+
+  .coupon-modal { text-align:center; }
+  .coupon-confetti { font-size:2.8rem;margin-bottom:1rem;animation:confettiBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes confettiBounce { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0)} }
+
+  .coupon-code-box {
+    background:var(--ink);border-radius:var(--radius);padding:18px 24px;
+    margin:0 auto 1rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;
+    border:1px solid rgba(184,148,42,0.3);box-shadow:var(--shadow-gold);
+  }
+  .coupon-code-box:hover { transform:translateY(-2px);box-shadow:0 8px 32px rgba(184,148,42,0.3); }
+  .coupon-code-text {
+    display:block;font-family:var(--ff-display);font-size:1.9rem;
+    letter-spacing:0.18em;color:var(--gold-lt);text-shadow:0 0 20px rgba(184,148,42,0.4);
+  }
+  .coupon-copy-hint { display:block;font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(232,212,138,0.5);margin-top:4px; }
+  .coupon-note { font-size:0.78rem;color:var(--ink-lt);line-height:1.7;margin-top:0.5rem; }
+
+  .nav__user { display:flex;align-items:center;gap:0.75rem; }
+  .nav__user-name { font-size:0.72rem;letter-spacing:0.1em;color:var(--ink-md);font-weight:500;text-transform:uppercase; }
+  .nav__user-avatar {
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--gold-dk),var(--gold));
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.75rem;color:var(--white);font-weight:600;letter-spacing:0.05em;
+    box-shadow:0 2px 8px rgba(184,148,42,0.3);
+  }
+  .nav__logout {
+    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--ink-lt);background:transparent;border:1px solid rgba(184,148,42,0.25);
+    padding:6px 14px;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);font-weight:500;
+  }
+  .nav__logout:hover { color:#B83232;border-color:rgba(184,50,50,0.4);background:rgba(184,50,50,0.04); }
+
+  .admin-check-label { display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--ink-md);cursor:pointer;font-weight:500;letter-spacing:0.06em; }
+  .admin-check-label input[type="checkbox"] { accent-color:var(--gold);width:15px;height:15px;cursor:pointer; }
+
+  .coupon-row {
+    background:var(--cream);border:1px solid rgba(184,148,42,0.12);
+    border-radius:var(--radius);padding:14px 18px;
+    display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem;transition:border-color 0.2s;
+  }
+  .coupon-row:hover { border-color:rgba(184,148,42,0.3); }
+  .coupon-row__left { display:flex;align-items:center;gap:0.6rem;flex:1; }
+  .coupon-row__code { font-family:var(--ff-display);font-size:1rem;color:var(--ink);letter-spacing:0.1em; }
+  .coupon-row__badge {
+    font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;
+    background:rgba(184,148,42,0.1);color:var(--gold-dk);
+    border:1px solid rgba(184,148,42,0.2);padding:3px 10px;border-radius:100px;font-weight:600;
+  }
+  .coupon-row__tag {
+    font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;
+    background:rgba(15,110,86,0.08);color:var(--teal-dk);
+    border:1px solid rgba(15,110,86,0.18);padding:3px 10px;border-radius:100px;font-weight:600;
+  }
+  .coupon-row__meta { display:flex;gap:1rem;font-size:0.72rem;color:var(--ink-lt);letter-spacing:0.04em; }
+  .coupon-row__actions { display:flex;align-items:center;gap:0.5rem; }
+  .coupon-row__edit {
+    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--gold-dk);background:rgba(184,148,42,0.06);border:1.5px solid rgba(184,148,42,0.25);
+    padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-weight:500;transition:var(--transition);
+  }
+  .coupon-row__edit:hover { background:var(--gold);color:var(--white);border-color:var(--gold); }
+  .coupon-toggle {
+    font-family:var(--ff-sans);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;
+    border:1.5px solid;padding:6px 14px;border-radius:100px;cursor:pointer;font-weight:600;transition:var(--transition);
+  }
+  .coupon-toggle.active { background:rgba(15,110,86,0.08);color:var(--teal-dk);border-color:rgba(15,110,86,0.3); }
+  .coupon-toggle.active:hover { background:var(--teal-dk);color:var(--white);border-color:var(--teal-dk); }
+  .coupon-toggle.inactive { background:rgba(107,87,68,0.06);color:var(--ink-lt);border-color:rgba(107,87,68,0.2); }
 `;
 
 /* ── WhatsApp Icon ── */
@@ -1110,22 +1200,20 @@ export default function App() {
   const [newCategory, setNewCategory] = useState("");
   const [imageFile, setImageFile]   = useState(null);
   const [showAdmin, setShowAdmin]   = useState(false);
-  const [password, setPassword]     = useState("");
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [menuOpen, setMenuOpen]     = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [uploading, setUploading]   = useState(false);
-  const { user, logout, isAdmin } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [welcomeCoupon, setWelcomeCoupon] = useState(null);
-  const [showAdminCoupons, setShowAdminCoupons] = useState(false);
+
+
+
+
 
   /* ── Data fetch ── */
   useEffect(() => {
     const load = () => {
       fetch(`${API_URL}/products`)
         .then((r) => r.json())
-        .then((d) => { setProducts(d.products ?? d); setLoading(false); })
+        .then((d) => { setProducts(d); setLoading(false); })
         .catch(() => setTimeout(load, 3000));
     };
     load();
@@ -1149,10 +1237,13 @@ export default function App() {
   useTilt(".process__step", 8);
   useHeroCanvas();
 
+  const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
   /* ── Admin login helper ── */
   const doLogin = useCallback(() => {
     if (password === "Bunny@MaaTarang") {
-      setShowAdminPanel(true); setShowAdmin(false); setPassword("");
+      setIsAdmin(true); setShowAdmin(false); setPassword("");
     } else {
       alert("Incorrect password. Please try again.");
     }
@@ -1196,20 +1287,7 @@ export default function App() {
           <li><a href="#products" className="nav__link">Collection</a></li>
           <li><a href="#about" className="nav__link">About</a></li>
           <li><a href="#contact" className="nav__link">Contact</a></li>
-          {user ? (
-            <>
-              <li><span style={{fontSize:"0.7rem",color:"var(--ink-lt)",letterSpacing:"0.05em"}}>Hi, {user.name}</span></li>
-              {isAdmin && (
-                <li><button className="nav__btn" onClick={() => setShowAdminCoupons(true)}>Coupons</button></li>
-              )}
-              {isAdmin && (
-                <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
-              )}
-              <li><button className="nav__btn" onClick={logout}>Sign Out</button></li>
-            </>
-          ) : (
-            <li><button className="nav__btn" onClick={() => setShowAuthModal(true)}>Sign In</button></li>
-          )}
+          <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
         </ul>
         <button
           className={`nav__hamburger${menuOpen ? " open" : ""}`}
@@ -1220,6 +1298,7 @@ export default function App() {
         </button>
       </nav>
 
+      {/* Mobile menu */}
       <ul className={`nav__mobile${menuOpen ? " open" : ""}`}>
         {["Home", "Collection", "About", "Contact"].map((item) => (
           <li key={item}>
@@ -1230,35 +1309,11 @@ export default function App() {
             >{item}</a>
           </li>
         ))}
-        {user ? (
-          <>
-            {isAdmin && (
-              <li>
-                <button className="nav__btn" onClick={() => { setShowAdminCoupons(true); setMenuOpen(false); }}>
-                  Coupons
-                </button>
-              </li>
-            )}
-            {isAdmin && (
-              <li>
-                <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
-                  Admin
-                </button>
-              </li>
-            )}
-            <li>
-              <button className="nav__btn" onClick={() => { logout(); setMenuOpen(false); }}>
-                Sign Out
-              </button>
-            </li>
-          </>
-        ) : (
-          <li>
-            <button className="nav__btn" onClick={() => { setShowAuthModal(true); setMenuOpen(false); }}>
-              Sign In
-            </button>
-          </li>
-        )}
+        <li>
+          <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
+            Admin
+          </button>
+        </li>
       </ul>
 
       {/* ── Admin Login Modal ── */}
@@ -1288,7 +1343,7 @@ export default function App() {
       )}
 
       {/* ── Admin Dashboard ── */}
-      {showAdminPanel && isAdmin && (
+      {isAdmin && (
         <div className="admin">
           <div className="admin__header">
             <div className="admin__icon">⚙️</div>
@@ -1333,16 +1388,16 @@ export default function App() {
                 try {
                   const formData = new FormData();
                   formData.append("image", imageFile);
-                  const token = localStorage.getItem("mt_token");
                   const uploadRes = await fetch(`${API_URL}/upload`, {
                     method: "POST",
-                    headers: { Authorization: `Bearer ${token}` },
                     body: formData,
                   });
                   const uploadData = await uploadRes.json();
                   await fetch(`${API_URL}/products`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
                     body: JSON.stringify({
                       name: newName, price: Number(newPrice),
                       category: newCategory, image: uploadData.imageUrl,
@@ -1701,35 +1756,6 @@ export default function App() {
           <WaIcon /> WhatsApp Us
         </a>
       </div>
-
-      {/* ── Auth Modal ── */}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onWelcomeCoupon={(coupon) => { setWelcomeCoupon(coupon); }}
-        />
-      )}
-
-      {/* ── Welcome Coupon Modal ── */}
-      {welcomeCoupon && (
-        <WelcomeCouponModal
-          coupon={welcomeCoupon}
-          onClose={() => setWelcomeCoupon(null)}
-        />
-      )}
-
-      {/* ── Admin Coupons Modal ── */}
-      {showAdminCoupons && isAdmin && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminCoupons(false)}>
-          <div className="modal" style={{ maxWidth: 800, width: "95%", maxHeight: "90vh", overflowY: "auto", padding: "2rem" }}>
-            <button className="modal__close" onClick={() => setShowAdminCoupons(false)}
-              style={{ position:"sticky", top:0, float:"right", background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"var(--ink-lt)" }}>
-              ✕
-            </button>
-            <AdminCoupons />
-          </div>
-        </div>
-      )}
     </>
   );
 }
