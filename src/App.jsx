@@ -1,9 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import logo from "./assets/logo.png";
-import { useAuth } from "./AuthContext";
-import AuthModal from "./AuthModal";
-import WelcomeCouponModal from "./WelcomeCouponModal";
-import AdminCoupons from "./AdminCoupons";
 
 const API_URL = "https://maatarang-backend.onrender.com";
 
