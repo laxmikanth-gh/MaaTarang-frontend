@@ -1,5 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import logo from "./assets/logo.png";
+import { useAuth } from "./AuthContext";
+import AuthModal from "./AuthModal";
+import WelcomeCouponModal from "./WelcomeCouponModal";
+import AdminCoupons from "./AdminCoupons";
 
 const API_URL = "https://maatarang-backend.onrender.com";
 
@@ -64,58 +68,36 @@ const css = `
   .loader {
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    background: var(--cream); position: relative; overflow: hidden;
+    background: var(--ink); position: relative; overflow: hidden;
   }
   .loader::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(184,148,42,0.08), transparent);
-  }
-  .loader__logo-wrap {
-    position: relative; display: flex; align-items: center; justify-content: center;
-    margin-bottom: 2.5rem;
+    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(184,148,42,0.14), transparent);
   }
   .loader__logo {
-    width: 220px; object-fit: contain;
+    width: 90px; height: 90px; object-fit: contain;
+    filter: brightness(10) sepia(1) saturate(3) hue-rotate(5deg);
+    opacity: 0.9; margin-bottom: 2rem;
     animation: loaderFloat 3s ease-in-out infinite;
-    position: relative; z-index: 2;
   }
-  .loader__ring {
-    position: absolute;
-    width: 260px; height: 260px;
-    border-radius: 50%;
-    border: 1.5px solid transparent;
-    border-top-color: var(--gold);
-    border-right-color: rgba(184,148,42,0.3);
-    animation: spinRing 1.4s linear infinite;
-  }
-  .loader__ring-2 {
-    position: absolute;
-    width: 290px; height: 290px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    border-bottom-color: var(--gold-lt);
-    border-left-color: rgba(184,148,42,0.2);
-    animation: spinRing 2.2s linear infinite reverse;
+  .loader__title {
+    font-family: var(--ff-display); font-size: 3.2rem; font-weight: 400;
+    letter-spacing: 0.12em; color: var(--gold-lt); margin-bottom: 0.5rem;
+    animation: fadeInUp 0.8s ease both;
   }
   .loader__sub {
-    font-size: 0.68rem; letter-spacing: 0.35em; text-transform: uppercase;
-    color: var(--ink-lt); margin-bottom: 2rem;
+    font-size: 0.72rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: rgba(232,212,138,0.5); margin-bottom: 3rem;
     animation: fadeInUp 0.8s 0.15s ease both;
   }
-  .loader__dots {
-    display: flex; gap: 8px; align-items: center;
+  .loader__bar { width: 180px; height: 1px; background: rgba(184,148,42,0.2); border-radius: 4px; overflow: hidden; }
+  .loader__bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dk), var(--gold-shine), var(--gold-dk));
+    background-size: 200% 100%; animation: shimmerBar 1.8s linear infinite; border-radius: 4px;
   }
-  .loader__dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold);
-    animation: dotPulse 1.4s ease-in-out infinite;
-  }
-  .loader__dot:nth-child(2) { animation-delay: 0.2s; background: var(--gold-lt); }
-  .loader__dot:nth-child(3) { animation-delay: 0.4s; background: var(--gold-dk); }
-
-  @keyframes loaderFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  @keyframes spinRing    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  @keyframes dotPulse    { 0%,100%{transform:scale(1);opacity:0.4} 50%{transform:scale(1.5);opacity:1} }
+  @keyframes loaderFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-10px) scale(1.03)} }
+  @keyframes shimmerBar  { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   @keyframes fadeInUp    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
   /* ══════════════════════
@@ -129,19 +111,19 @@ const css = `
     border-bottom: 1px solid rgba(184,148,42,0.15);
     padding: 0 5%;
     display: flex; align-items: center; justify-content: space-between;
-    height: 90px; transition: height 0.4s ease, box-shadow 0.4s ease;
+    height: 80px; transition: height 0.4s ease, box-shadow 0.4s ease;
   }
-  .nav.scrolled { box-shadow: 0 4px 32px rgba(26,20,16,0.1); height: 76px; }
+  .nav.scrolled { box-shadow: 0 4px 32px rgba(26,20,16,0.1); height: 66px; }
 
   .nav__brand { display: flex; align-items: center; gap: 0.9rem; text-decoration: none; }
 
   /* 3D — Logo rotates on hover */
   .nav__logo {
-    width: 180px; height: 72px; object-fit: contain;
+    width: 44px; height: 44px; object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.34,1.4,0.64,1);
     transform-style: preserve-3d;
   }
-  .nav__brand:hover .nav__logo { transform: perspective(300px) rotateY(28deg) scale(1.04); }
+  .nav__brand:hover .nav__logo { transform: perspective(300px) rotateY(28deg) scale(1.08); }
 
   .nav__name {
     font-family: var(--ff-display); font-size: 1.65rem; font-weight: 400;
@@ -1225,17 +1207,17 @@ export default function App() {
   const [menuOpen, setMenuOpen]     = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [uploading, setUploading]   = useState(false);
-
-
-
-
+  const { user, logout, isAdmin, token } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [welcomeCoupon, setWelcomeCoupon] = useState(null);
+  const [showAdminCoupons, setShowAdminCoupons] = useState(false);
 
   /* ── Data fetch ── */
   useEffect(() => {
     const load = () => {
       fetch(`${API_URL}/products`)
         .then((r) => r.json())
-        .then((d) => { setProducts(d); setLoading(false); })
+        .then((d) => { setProducts(d.products || d); setLoading(false); })
         .catch(() => setTimeout(load, 3000));
     };
     load();
@@ -1259,17 +1241,7 @@ export default function App() {
   useTilt(".process__step", 8);
   useHeroCanvas();
 
-  const [password, setPassword] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  /* ── Admin login helper ── */
-  const doLogin = useCallback(() => {
-    if (password === "Bunny@MaaTarang") {
-      setIsAdmin(true); setShowAdmin(false); setPassword("");
-    } else {
-      alert("Incorrect password. Please try again.");
-    }
-  }, [password]);
+  /* ── Admin login helper removed — now handled by JWT auth ── */
 
   /* ══════════════════════════════════════════════════════
      LOADER
@@ -1279,17 +1251,10 @@ export default function App() {
       <>
         <style>{css}</style>
         <div className="loader">
-          <div className="loader__logo-wrap">
-            <div className="loader__ring-2" />
-            <div className="loader__ring" />
-            <img src={logo} alt="MaaTarang" className="loader__logo" />
-          </div>
+          <img src={logo} alt="MaaTarang" className="loader__logo" />
+          <h1 className="loader__title">MaaTarang</h1>
           <p className="loader__sub">Preparing your collection</p>
-          <div className="loader__dots">
-            <div className="loader__dot" />
-            <div className="loader__dot" />
-            <div className="loader__dot" />
-          </div>
+          <div className="loader__bar"><div className="loader__bar-fill" /></div>
         </div>
       </>
     );
@@ -1305,9 +1270,10 @@ export default function App() {
       {/* ── Navbar ── */}
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
         <a href="#" className="nav__brand">
-          <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start"}}>
-            <img src={logo} alt="MaaTarang" className="nav__logo" />
-            <div className="nav__tagline" style={{alignSelf:"flex-end",marginTop:"2px"}}>Where Tradition Meets Artistry</div>
+          <img src={logo} alt="MaaTarang" className="nav__logo" />
+          <div>
+            <div className="nav__name">MaaTarang</div>
+            <div className="nav__tagline">Where Tradition Meets Artistry</div>
           </div>
         </a>
         <ul className="nav__links">
@@ -1315,7 +1281,22 @@ export default function App() {
           <li><a href="#products" className="nav__link">Collection</a></li>
           <li><a href="#about" className="nav__link">About</a></li>
           <li><a href="#contact" className="nav__link">Contact</a></li>
-          <li><button className="nav__btn" onClick={() => setShowAdmin(true)}>Admin</button></li>
+          <li>
+            {user ? (
+              <div className="nav__user">
+                <div className="nav__user-avatar">{user.name.charAt(0).toUpperCase()}</div>
+                <span className="nav__user-name">{user.name.split(" ")[0]}</span>
+                {isAdmin && (
+                  <button className="nav__btn" onClick={() => setShowAdminCoupons(!showAdminCoupons)}>
+                    🎟️ Coupons
+                  </button>
+                )}
+                <button className="nav__logout" onClick={logout}>Sign Out</button>
+              </div>
+            ) : (
+              <button className="nav__btn" onClick={() => setShowAuthModal(true)}>Sign In</button>
+            )}
+          </li>
         </ul>
         <button
           className={`nav__hamburger${menuOpen ? " open" : ""}`}
@@ -1338,36 +1319,28 @@ export default function App() {
           </li>
         ))}
         <li>
-          <button className="nav__btn" onClick={() => { setShowAdmin(true); setMenuOpen(false); }}>
-            Admin
-          </button>
+          {user ? (
+            <button className="nav__logout" onClick={() => { logout(); setMenuOpen(false); }}>Sign Out</button>
+          ) : (
+            <button className="nav__btn" onClick={() => { setShowAuthModal(true); setMenuOpen(false); }}>Sign In</button>
+          )}
         </li>
       </ul>
 
-      {/* ── Admin Login Modal ── */}
-      {showAdmin && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdmin(false)}>
-          <div className="modal">
-            <div className="modal__icon">🔐</div>
-            <h2 className="modal__title">Admin Access</h2>
-            <p className="modal__sub">Enter credentials to continue</p>
-            <div className="modal__divider" />
-            <div className="field-wrap">
-              <label className="field-label">Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") doLogin(); }}
-                className="field"
-                autoFocus
-              />
-            </div>
-            <button className="btn-primary" onClick={doLogin}>Sign In</button>
-            <button className="btn-ghost" onClick={() => setShowAdmin(false)}>Cancel</button>
-          </div>
-        </div>
+      {/* ── Auth Modal ── */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onWelcomeCoupon={(coupon) => setWelcomeCoupon(coupon)}
+        />
+      )}
+
+      {/* ── Welcome Coupon Modal ── */}
+      {welcomeCoupon && (
+        <WelcomeCouponModal
+          coupon={welcomeCoupon}
+          onClose={() => setWelcomeCoupon(null)}
+        />
       )}
 
       {/* ── Admin Dashboard ── */}
@@ -1419,12 +1392,14 @@ export default function App() {
                   const uploadRes = await fetch(`${API_URL}/upload`, {
                     method: "POST",
                     body: formData,
+                    headers: { Authorization: `Bearer ${token}` },
                   });
                   const uploadData = await uploadRes.json();
                   await fetch(`${API_URL}/products`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                       name: newName, price: Number(newPrice),
@@ -1444,6 +1419,13 @@ export default function App() {
               {uploading ? "Uploading…" : "Add Product"}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── Admin Coupon Panel ── */}
+      {isAdmin && showAdminCoupons && (
+        <div style={{ padding: "0 5% 2rem" }}>
+          <AdminCoupons />
         </div>
       )}
 
@@ -1572,7 +1554,10 @@ export default function App() {
                     onClick={async () => {
                       if (!window.confirm(`Delete "${product.name}"?`)) return;
                       try {
-                        await fetch(`${API_URL}/products/${product._id}`, { method: "DELETE" });
+                        await fetch(`${API_URL}/products/${product._id}`, {
+                          method: "DELETE",
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
                         window.location.reload();
                       } catch { alert("Delete failed."); }
                     }}
