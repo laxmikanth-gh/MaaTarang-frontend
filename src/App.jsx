@@ -137,11 +137,11 @@ const css = `
 
   /* 3D — Logo rotates on hover */
   .nav__logo {
-    width: 44px; height: 44px; object-fit: contain;
+    width: 140px; height: 56px; object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.34,1.4,0.64,1);
     transform-style: preserve-3d;
   }
-  .nav__brand:hover .nav__logo { transform: perspective(300px) rotateY(28deg) scale(1.08); }
+  .nav__brand:hover .nav__logo { transform: perspective(300px) rotateY(28deg) scale(1.04); }
 
   .nav__name {
     font-family: var(--ff-display); font-size: 1.65rem; font-weight: 400;
@@ -1306,10 +1306,7 @@ export default function App() {
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
         <a href="#" className="nav__brand">
           <img src={logo} alt="MaaTarang" className="nav__logo" />
-          <div>
-            <div className="nav__name">MaaTarang</div>
-            <div className="nav__tagline">Where Tradition Meets Artistry</div>
-          </div>
+          <div className="nav__tagline" style={{marginLeft:"0.5rem"}}>Where Tradition Meets Artistry</div>
         </a>
         <ul className="nav__links">
           <li><a href="#" className="nav__link">Home</a></li>
